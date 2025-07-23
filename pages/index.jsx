@@ -1,10 +1,12 @@
 import Head from 'next/head';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { parseMarkdownReport } from '../utils/parseMarkdownReport';
 import { parseRawReport } from '../utils/parseRawReport';
 
 export default function Home() {
   const [input, setInput] = useState('');
+  const [reportCount, setReportCount] = useState(0);
+  const [reloadFlag, setReloadFlag] = useState(false);
   // const [date, setDate] = useState('');
   const [date, setDate] = useState(() => {
     const today = new Date();
@@ -14,12 +16,29 @@ export default function Home() {
   const [rawOutput, setRawOutput] = useState('');
   const [markdownOutput, setMarkdownOutput] = useState('');
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     const raw = parseRawReport(input, date);
     const markdown = parseMarkdownReport(input, date);
     setRawOutput(raw);
     setMarkdownOutput(markdown);
+
+    // Call backend to increment
+    try {
+      await fetch('/api/increment', {
+        method: 'POST',
+      });
+      setReloadFlag((prev) => !prev);
+    } catch (err) {
+      console.error('Failed to increment report count:', err);
+    }
   };
+
+  useEffect(() => {
+    fetch('/api/increment')
+      .then((res) => res.json())
+      .then((data) => setReportCount(data.count))
+      .catch((err) => console.error('Failed to load count:', err));
+  }, [reloadFlag]);
 
   const copyToClipboard = () => {
     const text = view === 'markdown' ? markdownOutput : rawOutput;
@@ -47,6 +66,7 @@ export default function Home() {
                 onChange={(e) => setDate(e.target.value)}
               />
             </div>
+
             <div className="mb-3">
               <label className="form-label">Raw Slack Messages</label>
               <textarea
@@ -68,19 +88,22 @@ export default function Home() {
               <>
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <div>
+                    <button
+                      className={`me-2 btn ${view === 'markdown' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                      onClick={() => setView('markdown')}
+                    >
+                      Markdown View
+                    </button>
+                    <button class="btn btn-info text-white ">Total Report Generated: {reportCount}</button>
                     {/* <button
                     className={`btn me-2 ${view === 'raw' ? 'btn-secondary' : 'btn-outline-secondary'}`}
                     onClick={() => setView('raw')}
                   >
                     Raw View
                   </button> */}
-                    <button
-                      className={`btn ${view === 'markdown' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-                      onClick={() => setView('markdown')}
-                    >
-                      Markdown View
-                    </button>
+
                   </div>
+
                   <button className="btn btn-success" onClick={copyToClipboard}>
                     📋 Copy
                   </button>
