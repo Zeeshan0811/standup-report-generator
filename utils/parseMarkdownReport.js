@@ -21,15 +21,18 @@ export function parseMarkdownReport(input, date) {
   lines.forEach((line) => {
     const trimmedLine = line.trim();
 
+    // Ignore timestamps
+    if (line.match(/^Today at/) || line === '' || line.includes('edited')) return;
+
     // Skip time lines like "Today at 9:10 AM"
     if (timePattern.test(trimmedLine)) return;
 
-    console.log(`Processing line: ${trimmedLine}`);
+    // console.log(`Processing line: ${trimmedLine}`);
 
     const nameLineMatch = nameOrder.find((name) =>
       trimmedLine.startsWith(name)
     );
-    console.log(`nameLineMatch: ${nameLineMatch}`);
+    // console.log(`nameLineMatch: ${nameLineMatch}`);
 
     if (nameLineMatch) {
       currentUser = nameLineMatch;
