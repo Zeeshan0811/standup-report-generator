@@ -1,4 +1,4 @@
-
+import Head from 'next/head';
 import { useState } from 'react';
 import { parseMarkdownReport } from '../utils/parseMarkdownReport';
 import { parseRawReport } from '../utils/parseRawReport';
@@ -29,35 +29,70 @@ export default function Home() {
   };
 
   return (
-    <main style={{ padding: '2rem', maxWidth: '800px', margin: 'auto' }}>
-      <h1>Stand Up Report Generator</h1>
-      <input
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        style={{ display: 'block', marginBottom: '1rem' }}
-      />
-      <textarea
-        rows="10"
-        style={{ width: '100%', padding: '1rem' }}
-        placeholder="Paste raw Slack messages here..."
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-      />
-      <button onClick={handleGenerate} style={{ marginTop: '1rem' }}>Generate Report</button>
-
-      {markdownOutput && rawOutput && (
-        <>
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-            <button onClick={() => setView('raw')} style={{ backgroundColor: view === 'raw' ? '#0070f3' : '#ccc' }}>Raw View</button>
-            <button onClick={() => setView('markdown')} style={{ backgroundColor: view === 'markdown' ? '#0070f3' : '#ccc' }}>Markdown View</button>
-            <button onClick={copyToClipboard} style={{ marginLeft: 'auto', backgroundColor: '#22c55e' }}>📋 Copy</button>
+    <>
+      <Head>
+        <title>Stand Up Report Generator</title>
+      </Head>
+      <div className="container">
+        <h2 className="mb-4">Stand Up Report Generator</h2>
+        <div className="row">
+          {/* Input Section */}
+          <div className="col-md-6 mb-4">
+            <div className="mb-3">
+              <label className="form-label">Select Date</label>
+              <input
+                type="date"
+                className="form-control"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Raw Slack Messages</label>
+              <textarea
+                className="form-control"
+                rows="10"
+                placeholder="Paste raw Slack messages here..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+              ></textarea>
+            </div>
+            <button className="btn btn-primary w-100" onClick={handleGenerate}>
+              Generate Report
+            </button>
           </div>
-          <pre style={{ backgroundColor: '#f3f3f3', padding: '1rem', marginTop: '1rem', whiteSpace: 'pre-wrap' }}>
-            {view === 'markdown' ? markdownOutput : rawOutput}
-          </pre>
-        </>
-      )}
-    </main>
+
+          {/* Output Section */}
+          <div className="col-md-6">
+            {markdownOutput && rawOutput && (
+              <>
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  <div>
+                    {/* <button
+                    className={`btn me-2 ${view === 'raw' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                    onClick={() => setView('raw')}
+                  >
+                    Raw View
+                  </button> */}
+                    <button
+                      className={`btn ${view === 'markdown' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                      onClick={() => setView('markdown')}
+                    >
+                      Markdown View
+                    </button>
+                  </div>
+                  <button className="btn btn-success" onClick={copyToClipboard}>
+                    📋 Copy
+                  </button>
+                </div>
+                <pre className="bg-light p-3 rounded" style={{ whiteSpace: 'pre-wrap' }}>
+                  {view === 'markdown' ? markdownOutput : rawOutput}
+                </pre>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
