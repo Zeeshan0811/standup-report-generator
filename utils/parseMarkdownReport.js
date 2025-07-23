@@ -10,10 +10,10 @@ export function parseMarkdownReport(input, date) {
     "@Naznin",
     "@David",
     "@Zeeshan",
-    "@Muhiminul  ( Apon )"
+    "@Muhiminul ( Apon )"
   ];
 
-  const userData = {};
+  const userData = [];
   let currentUser = null;
 
   const timePattern = /^Today at \d{1,2}:\d{2} (AM|PM)$/i;
@@ -24,9 +24,12 @@ export function parseMarkdownReport(input, date) {
     // Skip time lines like "Today at 9:10 AM"
     if (timePattern.test(trimmedLine)) return;
 
+    console.log(`Processing line: ${trimmedLine}`);
+
     const nameLineMatch = nameOrder.find((name) =>
-      trimmedLine.startsWith(name.replace("@", ""))
+      trimmedLine.startsWith(name)
     );
+    console.log(`nameLineMatch: ${nameLineMatch}`);
 
     if (nameLineMatch) {
       currentUser = nameLineMatch;
@@ -40,15 +43,19 @@ export function parseMarkdownReport(input, date) {
     ? date.split("-").reverse().join("/") // Convert YYYY-MM-DD to DD/MM/YYYY
     : "DD/MM/YYYY";
 
-  let result = `Stand Up Report [BBS]\n${reportDate}\n@Kengo Otsuka san the stand-up report for today\n`;
+  let result = `Stand Up Report [BBS]\n${reportDate}\n@Kengo Otsuka san the stand-up report for today\n\n`;
 
   nameOrder.forEach((name) => {
     result += `${name}\n`;
+    result += "```\n";
     if (userData[name]) {
       userData[name].forEach((task) => {
         result += `${task}\n`;
       });
+    } else {
+      result += `No updates\n`;
     }
+    result += "```\n";
     result += `\n`;
   });
 
