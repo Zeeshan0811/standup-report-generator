@@ -60,9 +60,6 @@ export default function Home() {
             <button className="btn btn-primary w-100" onClick={handleGenerate}>
               Generate Report
             </button>
-            <p style={{ fontStyle: 'italic', marginTop: '0.5rem', color: '#888' }}>
-              💡 Use <strong>CTRL + SHIFT + F</strong> in Slack to format code blocks properly after pasting.
-            </p>
           </div>
 
           {/* Output Section */}
@@ -88,16 +85,26 @@ export default function Home() {
                     📋 Copy
                   </button>
                 </div>
-
-                <pre className="bg-light p-3 rounded" style={{ whiteSpace: 'pre-wrap' }}>
-                  {view === 'markdown' ? markdownOutput : rawOutput}
-                </pre>
+                <textarea
+                  className="form-control mb-3"
+                  rows="10"
+                  readOnly
+                  value={view === 'markdown' ? markdownOutput : rawOutput}
+                  style={{ whiteSpace: 'pre-wrap', backgroundColor: '#f8f9fa' }} >
+                </textarea>
+                <p style={{ fontStyle: 'italic', marginTop: '0.5rem', color: '#888' }}>
+                  💡 Use <strong>CTRL + SHIFT + F</strong> in Slack to format code blocks properly after pasting.
+                </p>
 
               </>
             )}
           </div>
         </div>
       </div>
+      <footer className="text-center mt-5 text-muted">
+        <hr />
+        <p className='text-end fst-italic'>Design and Developed by Zeeshan Akhtar</p>
+      </footer>
     </>
   );
 }
