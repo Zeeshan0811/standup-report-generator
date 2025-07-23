@@ -1,0 +1,56 @@
+export function parseMarkdownReport(input, date) {
+  const lines = input.trim().split("\n");
+
+  const nameOrder = [
+    "@Shafin Junayed",
+    "@Shad",
+    "@Shahriar Ahmed Shawon",
+    "@Nafis Nawal Nahiyan",
+    "@Satadip",
+    "@Naznin",
+    "@David",
+    "@Zeeshan",
+    "@Muhiminul  ( Apon )"
+  ];
+
+  const userData = {};
+  let currentUser = null;
+
+  const timePattern = /^Today at \d{1,2}:\d{2} (AM|PM)$/i;
+
+  lines.forEach((line) => {
+    const trimmedLine = line.trim();
+
+    // Skip time lines like "Today at 9:10 AM"
+    if (timePattern.test(trimmedLine)) return;
+
+    const nameLineMatch = nameOrder.find((name) =>
+      trimmedLine.startsWith(name.replace("@", ""))
+    );
+
+    if (nameLineMatch) {
+      currentUser = nameLineMatch;
+      if (!userData[currentUser]) userData[currentUser] = [];
+    } else if (currentUser && trimmedLine) {
+      userData[currentUser].push(trimmedLine);
+    }
+  });
+
+  const reportDate = date
+    ? date.split("-").reverse().join("/") // Convert YYYY-MM-DD to DD/MM/YYYY
+    : "DD/MM/YYYY";
+
+  let result = `Stand Up Report [BBS]\n${reportDate}\n@Kengo Otsuka san the stand-up report for today\n`;
+
+  nameOrder.forEach((name) => {
+    result += `${name}\n`;
+    if (userData[name]) {
+      userData[name].forEach((task) => {
+        result += `${task}\n`;
+      });
+    }
+    result += `\n`;
+  });
+
+  return result.trim();
+}
