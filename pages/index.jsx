@@ -5,7 +5,11 @@ import { parseRawReport } from '../utils/parseRawReport';
 
 export default function Home() {
   const [input, setInput] = useState('');
-  const [date, setDate] = useState('');
+  // const [date, setDate] = useState('');
+  const [date, setDate] = useState(() => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  });
   const [view, setView] = useState('markdown');
   const [rawOutput, setRawOutput] = useState('');
   const [markdownOutput, setMarkdownOutput] = useState('');
@@ -27,10 +31,10 @@ export default function Home() {
   return (
     <main style={{ padding: '2rem', maxWidth: '800px', margin: 'auto' }}>
       <h1>Stand Up Report Generator</h1>
-      <input 
-        type="date" 
-        value={date} 
-        onChange={(e) => setDate(e.target.value)} 
+      <input
+        type="date"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
         style={{ display: 'block', marginBottom: '1rem' }}
       />
       <textarea

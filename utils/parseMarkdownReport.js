@@ -2,15 +2,15 @@ export function parseMarkdownReport(input, date) {
   const lines = input.trim().split("\n");
 
   const nameOrder = [
-    "@Shafin Junayed",
-    "@Shad",
-    "@Shahriar Ahmed Shawon",
-    "@Nafis Nawal Nahiyan",
-    "@Satadip",
-    "@Naznin",
-    "@David",
-    "@Zeeshan",
-    "@Muhiminul ( Apon )"
+    "Shafin Junayed",
+    "Shad",
+    "Shahriar Ahmed Shawon",
+    "Nafis Nawal Nahiyan",
+    "Satadip",
+    "Naznin",
+    "David",
+    "Zeeshan",
+    "Muhiminul ( Apon )"
   ];
 
   const userData = [];
@@ -46,7 +46,7 @@ export function parseMarkdownReport(input, date) {
   let result = `Stand Up Report [BBS]\n${reportDate}\n@Kengo Otsuka san the stand-up report for today\n\n`;
 
   nameOrder.forEach((name) => {
-    result += `${name}\n`;
+    result += `@${name}\n`;
     result += "```\n";
     if (userData[name]) {
       userData[name].forEach((task) => {
