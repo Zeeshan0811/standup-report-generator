@@ -49,7 +49,9 @@ export function parseMarkdownReport(input, date) {
   let result = `Stand Up Report [BBS]\n${reportDate}\n@Kengo Otsuka san the stand-up report for today\n\n`;
 
   nameOrder.forEach((name) => {
-    result += `@${name}\n`;
+    let name_to_array = name.split(" ");
+    let first_name = name_to_array[0];
+    result += `@${first_name}\n`;
     result += "```\n";
     if (userData[name]) {
       userData[name].forEach((task) => {
