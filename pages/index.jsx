@@ -23,22 +23,22 @@ export default function Home() {
     setMarkdownOutput(markdown);
 
     // Call backend to increment
-    try {
-      await fetch('/api/increment', {
-        method: 'POST',
-      });
-      setReloadFlag((prev) => !prev);
-    } catch (err) {
-      console.error('Failed to increment report count:', err);
-    }
+    // try {
+    //   await fetch('/api/increment', {
+    //     method: 'POST',
+    //   });
+    //   setReloadFlag((prev) => !prev);
+    // } catch (err) {
+    //   console.error('Failed to increment report count:', err);
+    // }
   };
 
-  useEffect(() => {
-    fetch('/api/increment')
-      .then((res) => res.json())
-      .then((data) => setReportCount(data.count))
-      .catch((err) => console.error('Failed to load count:', err));
-  }, [reloadFlag]);
+  // useEffect(() => {
+  //   fetch('/api/increment')
+  //     .then((res) => res.json())
+  //     .then((data) => setReportCount(data.count))
+  //     .catch((err) => console.error('Failed to load count:', err));
+  // }, [reloadFlag]);
 
   const copyToClipboard = () => {
     const text = view === 'markdown' ? markdownOutput : rawOutput;
@@ -94,7 +94,7 @@ export default function Home() {
                     >
                       Markdown View
                     </button>
-                    <button class="btn btn-info text-white ">Total Report Generated: {reportCount}</button>
+                    {/* <button class="btn btn-info text-white ">Total Report Generated: {reportCount}</button> */}
                     {/* <button
                     className={`btn me-2 ${view === 'raw' ? 'btn-secondary' : 'btn-outline-secondary'}`}
                     onClick={() => setView('raw')}
