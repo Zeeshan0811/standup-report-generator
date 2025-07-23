@@ -60,6 +60,9 @@ export default function Home() {
             <button className="btn btn-primary w-100" onClick={handleGenerate}>
               Generate Report
             </button>
+            <p style={{ fontStyle: 'italic', marginTop: '0.5rem', color: '#888' }}>
+              💡 Use <strong>CTRL + SHIFT + F</strong> in Slack to format code blocks properly after pasting.
+            </p>
           </div>
 
           {/* Output Section */}
@@ -85,9 +88,11 @@ export default function Home() {
                     📋 Copy
                   </button>
                 </div>
+
                 <pre className="bg-light p-3 rounded" style={{ whiteSpace: 'pre-wrap' }}>
                   {view === 'markdown' ? markdownOutput : rawOutput}
                 </pre>
+
               </>
             )}
           </div>
