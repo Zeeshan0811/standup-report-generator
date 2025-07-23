@@ -88,6 +88,7 @@ export default function Home() {
                 <textarea
                   className="form-control mb-3"
                   rows="13"
+                  readonly
                   value={view === 'markdown' ? markdownOutput : rawOutput}
                   style={{ whiteSpace: 'pre-wrap', backgroundColor: '#f8f9fa' }} >
                 </textarea>
