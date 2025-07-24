@@ -150,10 +150,7 @@ const StandUpReportGenerator = () => {
                     </div>
                 </div>
             </div>
-            <footer className="text-center mt-5 text-muted">
-                <hr />
-                <p className='text-end fst-italic'>Design and Developed by Zeeshan Akhtar</p>
-            </footer>
+
         </>
     );
 }
