@@ -18,14 +18,31 @@ export function parseMarkdownReport(input, date) {
 
   const timePattern = /^Today at \d{1,2}:\d{2} (AM|PM)$/i;
 
+  // Exclude relative time
+  const relativeTimeRegex = /^(Yesterday|Today|Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|\d{1,2} (minutes?|hours?) ago)/i;
+
+  // Exclude timestamp formats like 'Jul 17th at 9:06 AM' or '17-07-2025'
+  const dateRegex = /^((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2}(st|nd|rd|th)? at \d{1,2}:\d{2} (AM|PM)|\d{2}-\d{2}-\d{4})$/i;
+
+  // Exclude emoji-only lines
+  const emojiOnlyRegex = /^(:[^:\s]+:|\p{Emoji})+$/u;
+
+  // Exclude number-only lines
+  const numberOnlyRegex = /^\d+$/;
+
   lines.forEach((line) => {
     const trimmedLine = line.trim();
 
-    // Ignore timestamps
-    if (line.match(/^Today at/) || line === '' || line.includes('edited')) return;
-
-    // Skip time lines like "Today at 9:10 AM"
-    if (timePattern.test(trimmedLine)) return;
+    // Skip lines that are timestamps, empty, or contain only emojis/numbers
+    if (
+      line.match(/^Today at/) || line === '' || line.includes('edited') ||      // Ignore timestamps
+      timePattern.test(trimmedLine) ||                                          // Skip time lines like "Today at 9:10 AM"
+      relativeTimeRegex.test(trimmedLine) ||
+      dateRegex.test(trimmedLine) ||
+      emojiOnlyRegex.test(trimmedLine) ||
+      numberOnlyRegex.test(trimmedLine)) {
+      return;
+    }
 
     // console.log(`Processing line: ${trimmedLine}`);
 
