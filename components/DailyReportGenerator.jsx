@@ -132,6 +132,9 @@ const DailyReportGenerator = () => {
                                 readOnly
                             />
                         </div>
+                        <p style={{ fontStyle: 'italic', marginTop: '0.5rem', color: '#888' }}>
+                            💡 Use <strong>CTRL + SHIFT + F</strong> in Slack to format code blocks properly after pasting.
+                        </p>
                     </div>
                 </div>
             </div>
