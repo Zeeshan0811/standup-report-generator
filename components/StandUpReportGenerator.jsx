@@ -7,7 +7,7 @@ const StandUpReportGenerator = () => {
     const [input, setInput] = useState('');
     const [reportCount, setReportCount] = useState(0);
     const [reloadFlag, setReloadFlag] = useState(false);
-    // const [date, setDate] = useState('');
+    const [copied, setCopied] = useState({ raw: false, markdown: false });
     const [date, setDate] = useState(() => {
         const today = new Date();
         return today.toISOString().split('T')[0];
@@ -40,12 +40,30 @@ const StandUpReportGenerator = () => {
     //     .catch((err) => console.error('Failed to load count:', err));
     // }, [reloadFlag]);
 
-    const copyToClipboard = () => {
-        const text = view === 'markdown' ? markdownOutput : rawOutput;
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Copied to clipboard!');
-        });
+    // const copyToClipboard = () => {
+    //     const text = view === 'markdown' ? markdownOutput : rawOutput;
+    //     navigator.clipboard.writeText(text).then(() => {
+    //         alert('Copied to clipboard!');
+    //     });
+    // };
+
+    useEffect(() => {
+        handleGenerate();
+    }, [input, date]);
+
+    const handleCopy = async (textType) => {
+        const text = textType === 'markdown' ? markdownOutput : rawOutput;
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopied((prev) => ({ ...prev, [textType]: true }));
+            setTimeout(() => {
+                setCopied((prev) => ({ ...prev, [textType]: false }));
+            }, 2000); // Reset after 2 seconds
+        } catch (err) {
+            console.error("Failed to copy:", err);
+        }
     };
+
 
     return (
         <>
@@ -77,9 +95,9 @@ const StandUpReportGenerator = () => {
                                 onChange={(e) => setInput(e.target.value)}
                             ></textarea>
                         </div>
-                        <button className="btn btn-primary w-100" onClick={handleGenerate}>
+                        {/* <button className="btn btn-primary w-100" onClick={handleGenerate}>
                             Generate Report
-                        </button>
+                        </button> */}
                     </div>
 
                     {/* Output Section */}
@@ -104,8 +122,16 @@ const StandUpReportGenerator = () => {
 
                                     </div>
 
-                                    <button className="btn btn-success" onClick={copyToClipboard}>
+                                    {/* <button className="btn btn-success" onClick={copyToClipboard}>
                                         📋 Copy
+                                    </button> */}
+
+                                    <button
+                                        className={`btn btn-sm ${copied.markdown ? "btn-success" : "btn-secondary"
+                                            }`}
+                                        onClick={() => handleCopy("markdown")}
+                                    >
+                                        📋 {copied.markdown ? "Copied!" : "Copy"}
                                     </button>
                                 </div>
                                 <textarea

@@ -99,11 +99,11 @@ const DailyReportGenerator = () => {
                             <label className="form-label d-flex justify-content-between">
                                 Today's Task
                                 <button
-                                    className={`btn btn-sm ${copied.today ? "btn-success" : "btn-outline-primary"
+                                    className={`btn btn-sm ${copied.today ? "btn-success" : "btn-secondary"
                                         }`}
                                     onClick={() => handleCopy("today")}
                                 >
-                                    {copied.today ? "Copied!" : "Copy"}
+                                    📋 {copied.today ? "Copied!" : "Copy"}
                                 </button>
                             </label>
 
@@ -118,11 +118,11 @@ const DailyReportGenerator = () => {
                             <label className="form-label d-flex justify-content-between">
                                 Daily Report
                                 <button
-                                    className={`btn btn-sm ${copied.report ? "btn-success" : "btn-outline-primary"
+                                    className={`btn btn-sm ${copied.report ? "btn-success" : "btn-secondary"
                                         }`}
                                     onClick={() => handleCopy("report")}
                                 >
-                                    {copied.report ? "Copied!" : "Copy"}
+                                    📋 {copied.report ? "Copied!" : "Copy"}
                                 </button>
                             </label>
                             <textarea
