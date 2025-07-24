@@ -16,6 +16,8 @@ export function parseMarkdownReport(input, date) {
   const userData = [];
   let currentUser = null;
 
+  const unwantedLineRegex = /^(\d+\s+(minutes?|replies?)\s+ago|Yesterday|Today|Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|\d{1,2}-\d{1,2}-\d{4}|Jul\s\d{1,2}(st|nd|rd|th)?\s+at\s+\d{1,2}:\d{2}\s+(AM|PM)|:\w+:)$/i;
+
   const timePattern = /^Today at \d{1,2}:\d{2} (AM|PM)$/i;
 
   // Exclude relative time
@@ -35,6 +37,7 @@ export function parseMarkdownReport(input, date) {
 
     // Skip lines that are timestamps, empty, or contain only emojis/numbers
     if (
+      unwantedLineRegex.test(trimmedLine) ||                                          // Skip time lines like "Today at 9:10 AM"
       line.match(/^Today at/) || line === '' || line.includes('edited') ||      // Ignore timestamps
       timePattern.test(trimmedLine) ||                                          // Skip time lines like "Today at 9:10 AM"
       relativeTimeRegex.test(trimmedLine) ||
