@@ -73,7 +73,7 @@ export function parseMarkdownReport(input, date) {
     ? date.split("-").reverse().join("/") // Convert YYYY-MM-DD to DD/MM/YYYY
     : "DD/MM/YYYY";
 
-  let result = `Stand Up Report [BBS]\n${reportDate}\n@Kengo Otsuka san the stand-up report for today\n\n`;
+  let result = `**Stand Up Report [BBS]\n${reportDate}**\n\n@Kengo Otsuka san, The stand-up report for today\n\n`;
 
   nameOrder.forEach((name) => {
     let name_to_array = name.split(" ");
