@@ -32,7 +32,8 @@ export function parseMarkdownReport(input, date) {
   // Exclude emoji-only lines
   const emojiOnlyRegex = /^(:[^:\s]+:|\p{Emoji})+$/u;
 
-
+  // Skip "Just now"
+  // const justNowRegex = /^Just now$/i;
 
   // Exclude number-only lines
   const numberOnlyRegex = /^\d+$/;
@@ -43,7 +44,7 @@ export function parseMarkdownReport(input, date) {
     // Skip lines that are timestamps, empty, or contain only emojis/numbers
     if (
       unwantedLineRegex.test(trimmedLine) ||                                          // Skip time lines like "Today at 9:10 AM"
-      line.match(/^Today at/) || line === '' || line.includes('edited') ||      // Ignore timestamps
+      line.match(/^Today at/) || line.match(/^Just now/) || line === '' || line.includes('edited') ||      // Ignore timestamps
       timePattern.test(trimmedLine) ||                                          // Skip time lines like "Today at 9:10 AM"
       relativeTimeRegex.test(trimmedLine) ||
       dateRegex.test(trimmedLine) ||
