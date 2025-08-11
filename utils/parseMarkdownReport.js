@@ -26,8 +26,13 @@ export function parseMarkdownReport(input, date) {
   // Exclude timestamp formats like 'Jul 17th at 9:06 AM' or '17-07-2025'
   const dateRegex = /^((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2}(st|nd|rd|th)? at \d{1,2}:\d{2} (AM|PM)|\d{2}-\d{2}-\d{4})$/i;
 
+  // Skip Slack-style emoji + time (e.g., ":headphones: 8:58 AM")
+  const emojiWithTimeRegex = /^:[a-zA-Z0-9_+-]+:\s+\d{1,2}:\d{2}\s?(?:AM|PM)$/;
+
   // Exclude emoji-only lines
   const emojiOnlyRegex = /^(:[^:\s]+:|\p{Emoji})+$/u;
+
+
 
   // Exclude number-only lines
   const numberOnlyRegex = /^\d+$/;
@@ -42,6 +47,7 @@ export function parseMarkdownReport(input, date) {
       timePattern.test(trimmedLine) ||                                          // Skip time lines like "Today at 9:10 AM"
       relativeTimeRegex.test(trimmedLine) ||
       dateRegex.test(trimmedLine) ||
+      emojiWithTimeRegex.test(trimmedLine) ||
       emojiOnlyRegex.test(trimmedLine) ||
       numberOnlyRegex.test(trimmedLine)) {
       return;
