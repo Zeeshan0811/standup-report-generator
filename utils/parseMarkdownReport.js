@@ -44,6 +44,7 @@ export function parseMarkdownReport(input, date) {
     // Skip lines that are timestamps, empty, or contain only emojis/numbers
     if (
       unwantedLineRegex.test(trimmedLine) ||                                          // Skip time lines like "Today at 9:10 AM"
+      line.includes(':headphones:') ||
       line.match(/^Today at/) || line.match(/^Just now/) || line === '' || line.includes('edited') ||      // Ignore timestamps
       timePattern.test(trimmedLine) ||                                          // Skip time lines like "Today at 9:10 AM"
       relativeTimeRegex.test(trimmedLine) ||
