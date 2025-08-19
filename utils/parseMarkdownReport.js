@@ -45,7 +45,7 @@ export function parseMarkdownReport(input, date) {
     if (
       unwantedLineRegex.test(trimmedLine) ||                                                                                           // Skip time lines like "Today at 9:10 AM"
       line.includes(':headphones:') ||
-      line.match(/^Today at/) || line.match(/^Just now/) || line === '' || line.includes('edited') || line.includes('New') ||     // Ignore timestamps
+      line.match(/^Today at/) || line.match(/^Just now/) || line === '' || line.includes('edited') || line == 'New' ||     // Ignore timestamps
       timePattern.test(trimmedLine) ||                                                                                                  // Skip time lines like "Today at 9:10 AM"
       relativeTimeRegex.test(trimmedLine) ||
       dateRegex.test(trimmedLine) ||
