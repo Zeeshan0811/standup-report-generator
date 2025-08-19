@@ -43,10 +43,10 @@ export function parseMarkdownReport(input, date) {
 
     // Skip lines that are timestamps, empty, or contain only emojis/numbers
     if (
-      unwantedLineRegex.test(trimmedLine) ||                                          // Skip time lines like "Today at 9:10 AM"
+      unwantedLineRegex.test(trimmedLine) ||                                                                                           // Skip time lines like "Today at 9:10 AM"
       line.includes(':headphones:') ||
-      line.match(/^Today at/) || line.match(/^Just now/) || line === '' || line.includes('edited') ||      // Ignore timestamps
-      timePattern.test(trimmedLine) ||                                          // Skip time lines like "Today at 9:10 AM"
+      line.match(/^Today at/) || line.match(/^Just now/) || line === '' || line.includes('edited') || line.includes('New') ||     // Ignore timestamps
+      timePattern.test(trimmedLine) ||                                                                                                  // Skip time lines like "Today at 9:10 AM"
       relativeTimeRegex.test(trimmedLine) ||
       dateRegex.test(trimmedLine) ||
       emojiWithTimeRegex.test(trimmedLine) ||
@@ -74,7 +74,8 @@ export function parseMarkdownReport(input, date) {
     ? date.split("-").reverse().join("/") // Convert YYYY-MM-DD to DD/MM/YYYY
     : "DD/MM/YYYY";
 
-  let result = `Stand Up Report [BBS]\n${reportDate}\n\n@Kengo Otsuka san, The stand-up report for today\n\n`;
+  // let result = `Stand Up Report [BBS]\n${reportDate}\n\n@Kengo Otsuka san, The stand-up report for today\n\n`;
+  let result = `*Stand Up Report [BBS]*\n${reportDate}\n\n*@Kengo Otsuka san, The stand-up report for today*\n\n`;
 
   nameOrder.forEach((name) => {
     let name_to_array = name.split(" ");
