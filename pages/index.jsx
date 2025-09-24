@@ -11,7 +11,7 @@ const Home = () => {
   return (
     <div>
       <Header onSelect={setActiveTab} />
-      <div className="container">
+      <div className="container-fluid">
         {activeTab === "daily" && <DailyReportGenerator />}
         {activeTab === "standup" && <StandUpReportGenerator />}
       </div>

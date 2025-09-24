@@ -1,1 +1,10 @@
-body { font-family: sans-serif; padding: 1rem; }
+body {
+    font-family: sans-serif;
+    padding: 1rem;
+}
+
+.list-group-item:hover {
+    background-color: #e8f5e9;
+    /* light green background */
+    cursor: pointer;
+}
