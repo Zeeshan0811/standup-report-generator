@@ -15,6 +15,7 @@ export function parseMarkdownReport(input, date) {
   ];
 
   const userData = [];
+  const userNoData = [];
   let currentUser = null;
 
   const unwantedLineRegex = /^(\d+\s+(minutes?|replies?)\s+ago|Yesterday|Today|Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|\d{1,2}-\d{1,2}-\d{4}|Jul\s\d{1,2}(st|nd|rd|th)?\s+at\s+\d{1,2}:\d{2}\s+(AM|PM)|:\w+:)$/i;
@@ -76,7 +77,7 @@ export function parseMarkdownReport(input, date) {
     : "DD/MM/YYYY";
 
   // let result = `Stand Up Report [BBS]\n${reportDate}\n\n@Kengo Otsuka san, The stand-up report for today\n\n`;
-  let result = `*Stand Up Report [BBS]*\n*${reportDate}*\n\n*@Kengo Otsuka San, The stand-up report for today*\n\n`;
+  let result = `*Stand Up Report [BBS]*\n*${reportDate}*\n\n*@Kengo Otsuka San*,\n*@Yusei Kumoi San*\n\nThe stand-up report for today*\n\n`;
 
   nameOrder.forEach((name) => {
     let name_to_array = name.split(" ");
@@ -88,6 +89,7 @@ export function parseMarkdownReport(input, date) {
         result += `${task}\n`;
       });
     } else {
+      userNoData.push(name);
       result += `No updates\n`;
     }
     result += "```\n";
