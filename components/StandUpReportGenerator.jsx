@@ -82,14 +82,22 @@ const StandUpReportGenerator = () => {
                 {/* Input Section */}
                 <div className="col-md-2 mb-4">
                     <div className="list-group shadow-sm rounded">
-                        {nameOrder.map((item, index) => (
-                            <div
-                                key={index}
-                                className="list-group-item list-group-item-action text-success fw-semibold text-center"
-                            >
-                                {item}
-                            </div>
-                        ))}
+                        {nameOrder.map((item, index) => {
+                            const found = userNoDataList.includes(item);
+                            return (
+                                <div
+                                    key={index}
+                                    className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                                >
+                                    <span className="text-success fw-semibold">{item}</span>
+                                    {input && (
+                                        found
+                                            ? <i className="bi bi-x-circle-fill text-danger"></i>
+                                            : <i className="bi bi-check-circle-fill text-success"></i>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
                 <div className="col-md-5 mb-4">
@@ -149,7 +157,7 @@ const StandUpReportGenerator = () => {
                                         📋 Copy
                                     </button> */}
 
-                                <button className="btn btn-danger text-white">Missing Report Count: {userNoDataList.length}</button>
+                                {input && userNoDataList.length > 0 ? <button className="btn btn-danger text-white">Missing Report Count: {userNoDataList.length}</button> : null}
 
 
                                 <button
