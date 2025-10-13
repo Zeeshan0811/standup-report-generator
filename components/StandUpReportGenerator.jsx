@@ -143,7 +143,7 @@ const StandUpReportGenerator = () => {
                                     >
                                         Markdown View
                                     </button>
-                                    {/* <button class="btn btn-info text-white ">Total Report Generated: {reportCount}</button> */}
+                                    {/* <button className="btn btn-info text-white ">Total Report Generated: {reportCount}</button> */}
                                     {/* <button
                     className={`btn me-2 ${view === 'raw' ? 'btn-secondary' : 'btn-outline-secondary'}`}
                     onClick={() => setView('raw')}
