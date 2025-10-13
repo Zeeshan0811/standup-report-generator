@@ -84,18 +84,23 @@ export function parseMarkdownReport(input, date) {
   nameOrder.forEach((name) => {
     let name_to_array = name.split(" ");
     let first_name = name_to_array[0];
-    result += `@${first_name}\n`;
-    result += "```\n";
+
     if (userData[name]) {
+      result += `@${first_name}\n`;
+      result += "```\n";
       userData[name].forEach((task) => {
         result += `${task}\n`;
       });
-    } else {
-      userNoData.push(name);
-      result += `No updates\n`;
+      result += "```\n";
+      result += `\n`;
+
     }
-    result += "```\n";
-    result += `\n`;
+
+    // else {
+    //   userNoData.push(name);
+    //   result += `No updates\n`;
+    // }
+
   });
 
   // return result.trim();
