@@ -93,13 +93,10 @@ export function parseMarkdownReport(input, date) {
       });
       result += "```\n";
       result += `\n`;
-
+    } else {
+      userNoData.push(name);
+      // result += `No updates\n`;
     }
-
-    // else {
-    //   userNoData.push(name);
-    //   result += `No updates\n`;
-    // }
 
   });
 
