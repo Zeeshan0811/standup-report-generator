@@ -7,8 +7,8 @@ const Header = () => {
         <nav className="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
             <div className="container-fluid">
                 {/* Brand */}
-                <a className="navbar-brand fw-bold fs-4 text-primary d-flex align-items-center" href="/">
-                    <i className="bi bi-grid-fill me-2 text-primary"></i> JB Suite
+                <a className="navbar-brand fw-bold fs-4 text-success d-flex align-items-center" href="/">
+                    <i className="bi bi-grid-fill me-2 text-success"></i> JB Suite
                 </a>
 
                 {/* Toggler for mobile */}
@@ -30,7 +30,7 @@ const Header = () => {
                         <li className="nav-item mx-1">
                             <Link
                                 href="/daily-report"
-                                className="nav-link fw-semibold px-3 py-2 rounded text-primary hover-bg-light"
+                                className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light"
                             >
                                 <i className="bi bi-journal-text me-1"></i> Daily Report
                             </Link>
@@ -38,9 +38,17 @@ const Header = () => {
                         <li className="nav-item mx-1">
                             <Link
                                 href="/standup-report"
-                                className="nav-link fw-semibold px-3 py-2 rounded text-primary hover-bg-light"
+                                className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light"
                             >
                                 <i className="bi bi-clipboard-check me-1"></i> Stand-Up Report
+                            </Link>
+                        </li>
+                        <li className="nav-item mx-1">
+                            <Link
+                                href="/markdown-editor"
+                                className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light"
+                            >
+                                <i className="bi bi-markdown me-1"></i> Markdown Editor
                             </Link>
                         </li>
                     </ul>

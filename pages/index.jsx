@@ -8,7 +8,7 @@ const Home = () => {
       {/* <!-- Hero Section --> */}
       <section className="hero">
         <div className="container">
-          <h1>Welcome to JB Suite</h1>
+          <h1 className="text-success">Welcome to JB Suite</h1>
           <p>Your daily productivity tools — simple, fast, and efficient.</p>
         </div>
       </section>
@@ -46,6 +46,24 @@ const Home = () => {
                     Quickly create structured team stand-up reports.
                   </p>
                   <a href="/standup-report" className="btn btn-success">Open Tool</a>
+                </div>
+              </div>
+            </div>
+
+            {/* <!-- Markdown Editor --> */}
+            <div className="col-md-5 col-lg-4">
+              <div className="card tool-card h-100">
+                <div className="card-body text-center p-4">
+                  <div className="mb-3">
+                    <i className="bi bi-markdown display-5 text-warning"></i>
+                  </div>
+                  <h5 className="card-title fw-bold">Markdown Editor</h5>
+                  <p className="card-text text-muted">
+                    Write, preview, and export Markdown documents with live rendering.
+                  </p>
+                  <a href="/markdown-editor" className="btn btn-warning text-dark px-4">
+                    Open Tool
+                  </a>
                 </div>
               </div>
             </div>
