@@ -56,7 +56,7 @@ export default function JsonBeautifier() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "beautified.json";
+        a.download = "beautified" + Math.floor(Date.now() / 1000) + ".json";
         a.click();
         URL.revokeObjectURL(url);
     };
