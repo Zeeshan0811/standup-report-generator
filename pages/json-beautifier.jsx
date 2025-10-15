@@ -1,68 +1,64 @@
-'use-client'
-import React, { useState, useEffect } from 'react'
-import Editor from "@monaco-editor/react";
+'use client';
+import { useState, useRef } from "react";
+import Editor, { OnChange } from "@monaco-editor/react";
 
-const json_beautifier = () => {
-    const [input, setInput] = useState('');
-    const [output, setOutput] = useState('');
-    const [error, setError] = useState('');
+export default function JsonBeautifier() {
+    const [input, setInput] = useState("");
+    const [output, setOutput] = useState("");
+    const [error, setError] = useState("");
 
+    const editorRef = useRef(null);
 
-    const handleBeautify = () => {
-        if (!input.trim()) {
+    // 🧩 Beautify JSON immediately
+    const beautifyJson = (value) => {
+        if (!value.trim()) {
             setOutput("");
             setError("");
             return;
         }
 
         try {
-            const parsed = JSON.parse(input);
-            const pretty = JSON.stringify(parsed, null, 2);
-            setOutput(pretty);
-            setError('');
-        } catch (err) {
-            setError('❌ Invalid JSON: ' + err.message);
-            setOutput('');
+            const parsed = JSON.parse(value);
+            const formatted = JSON.stringify(parsed, null, 2);
+            setOutput(formatted);
+            setError("");
+        } catch {
+            setOutput("");
+            setError("⚠️ Invalid JSON syntax");
         }
     };
 
-    useEffect(() => {
-        console.log("Input changed:", Math.floor(Date.now() / 1000));
-        const timeout = setTimeout(() => {
-            handleBeautify();
-        }, 3000);
-        return () => clearTimeout(timeout);
-    }, [input]);
+    // 🔹 Handle editor changes (typing)
+    const handleInputChange = (value) => {
+        const val = value || "";
+        setInput(val);
+        beautifyJson(val);
+    };
 
-
-    const handleCopy = async () => {
+    // 🔹 Copy output to input
+    const copyOutputToInput = () => {
         if (output) {
-            await navigator.clipboard.writeText(output);
-            alert('Beautified JSON copied to clipboard!');
+            setInput(output);
+            beautifyJson(output);
         }
     };
 
-    const handleClear = () => {
-        setInput('');
-        setOutput('');
-        setError('');
-    };
-
-    // Download JSON
-    const handleDownload = () => {
+    // 🔹 Copy output to clipboard
+    const copyOutput = () => {
         if (!output) return;
-        const blob = new Blob([output], { type: 'application/json' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = "beautified_" + Math.floor(Date.now() / 1000) + ".json";
-        link.click();
+        navigator.clipboard.writeText(output);
     };
 
-    const handlePaste = (e) => {
-        const text = e.clipboardData.getData("text");
-        setInput(text); // Immediately update input state
-        handleBeautify(text); // Beautify pasted content immediately
-        e.preventDefault(); // Optional: prevent default paste if using plain editor
+    // 🔹 Download output as JSON file
+    const downloadOutput = () => {
+        if (!output) return;
+        const blob = new Blob([output], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "beautified.json";
+        a.click();
+        URL.revokeObjectURL(url);
     };
 
     return (
@@ -78,18 +74,30 @@ const json_beautifier = () => {
             </div>
 
             <div className="row g-4">
-                {/* Input Area */}
-                <div className="col-lg-6">
-                    <div className="card h-100 border-0 shadow-sm">
-                        <div className="card-header bg-light fw-semibold">Input JSON</div>
-                        <div className="card-body">
+                {/* Input JSON */}
+                <div className="col-md-6">
+                    <div className="card shadow-sm border-0 h-100">
+                        <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <span className="fw-semibold">Input JSON</span>
+                            <div className="d-flex gap-2">
+                                <button
+                                    className="btn btn-outline-light btn-sm d-flex align-items-center"
+                                    onClick={copyOutputToInput}
+                                    disabled={!output}
+                                >
+                                    <i className="bi bi-arrow-repeat me-1"></i> Copy Output → Input
+                                </button>
+                            </div>
+                        </div>
+
+                        <div style={{ minHeight: "300px" }}>
                             <Editor
-                                height="100%"
+                                height="50vh"
                                 defaultLanguage="json"
                                 theme="vs-light"
                                 value={input}
-                                onChange={(val) => setInput(val || "")}
-                                onPaste={handlePaste}
+                                onChange={handleInputChange}
+                                onMount={(editor) => (editorRef.current = editor)}
                                 options={{
                                     minimap: { enabled: false },
                                     wordWrap: "on",
@@ -98,84 +106,52 @@ const json_beautifier = () => {
                                 }}
                             />
                         </div>
-                        <div className="card-footer bg-white d-flex justify-content-between">
-                            <button
-                                className="btn btn-outline-info"
-                                onClick={handleBeautify}
-                            >
-                                <i className="bi bi-magic me-1"></i> Beautify
-                            </button>
-                            <button
-                                className="btn btn-outline-primary d-flex align-items-center"
-                                onClick={() => {
-                                    if (output) {
-                                        setInput(output);
-                                        setError("");
-                                    }
-                                }}
-                                disabled={!output}
-                            >
-                                <i className="bi bi-arrow-repeat me-2"></i> Copy Output to Input
-                            </button>
-                            <button className="btn btn-outline-secondary" onClick={handleClear}>
-                                <i className="bi bi-x-circle me-1"></i> Clear
-                            </button>
-                        </div>
+
+                        {error && <p className="text-danger small m-2">{error}</p>}
                     </div>
                 </div>
 
-                {/* Output Area */}
-                <div className="col-lg-6">
-                    <div className="card h-100 border-0 shadow-sm">
-                        <div className="card-header bg-light fw-semibold">Beautified JSON</div>
-                        <div className="card-body bg-light p-3 overflow-auto" style={{ minHeight: '300px' }}   >
-                            {error ? (
-                                <div className="alert alert-danger py-2 mb-0">{error}</div>
-                            ) : (
-                                <Editor
-                                    height="50vh"
-                                    defaultLanguage="json"
-                                    theme="vs-light"
-                                    value={input}
-                                    onChange={(val) => setInput(val || "")}
-                                    options={{
-                                        minimap: { enabled: false },
-                                        wordWrap: "on",
-                                        fontSize: 14,
-                                        automaticLayout: true,
-                                    }}
-                                />
-                            )}
-                        </div>
-                        <div className="card-footer bg-light d-flex justify-content-between align-items-center rounded-bottom shadow-sm">
-                            <span className="text-muted small fst-italic">
-                                Output actions
-                            </span>
+                {/* Output JSON */}
+                <div className="col-md-6">
+                    <div className="card shadow-sm border-0 h-100">
+                        <div className="card-header bg-success text-white fw-semibold  d-flex justify-content-between align-items-center">
+                            <span>Beautified JSON</span>
 
                             <div className="d-flex gap-2">
                                 <button
-                                    onClick={handleCopy}
-                                    className="btn btn-outline-success d-flex align-items-center"
+                                    className="btn btn-outline-light btn-sm d-flex align-items-center"
+                                    onClick={copyOutput}
                                     disabled={!output}
                                 >
-                                    <i className="bi bi-clipboard-check me-2"></i> Copy
+                                    <i className="bi bi-clipboard-check me-1"></i> Copy Output
                                 </button>
-
                                 <button
-                                    onClick={handleDownload}
-                                    className="btn btn-primary d-flex align-items-center"
+                                    className="btn btn-light btn-sm d-flex align-items-center text-dark"
+                                    onClick={downloadOutput}
                                     disabled={!output}
                                 >
-                                    <i className="bi bi-download me-2"></i> Download
+                                    <i className="bi bi-download me-1"></i> Download
                                 </button>
                             </div>
                         </div>
-
+                        <div style={{ minHeight: "300px" }}>
+                            <Editor
+                                height="50vh"
+                                defaultLanguage="json"
+                                theme="vs-light"
+                                value={output}
+                                options={{
+                                    readOnly: true,
+                                    minimap: { enabled: false },
+                                    wordWrap: "on",
+                                    fontSize: 14,
+                                    automaticLayout: true,
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
         </>
-    )
+    );
 }
-
-export default json_beautifier
