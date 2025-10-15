@@ -51,6 +51,12 @@ const Header = () => {
                                 <i className="bi bi-markdown me-1"></i> Markdown Editor
                             </Link>
                         </li>
+                        <li className="nav-item mx-1">
+                            <Link href="/json-beautifier"
+                                className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light">
+                                <i className="bi bi-braces me-1"></i> JSON Beautifier
+                            </Link>
+                        </li>
                     </ul>
                 </div>
             </div>

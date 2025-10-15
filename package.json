@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
     "bootstrap": "^5.3.7",
     "materialize-css": "^1.0.0",
     "md-editor-rt": "^6.1.0",
