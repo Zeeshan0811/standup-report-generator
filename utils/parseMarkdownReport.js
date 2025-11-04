@@ -13,7 +13,8 @@ export function parseMarkdownReport(input, date) {
     "Muhiminul ( Apon )",
     "Safwan",
     "Jalish Mahmud",
-    "Anisur Rahman (Shahin)"
+    "Anisur Rahman (Shahin)",
+    "Amin"
   ];
 
   const userData = [];
