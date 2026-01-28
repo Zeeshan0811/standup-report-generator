@@ -1,4 +1,27 @@
+function normalizeSlackText(raw) {
+  return raw
+    // Put newline BEFORE every "Name  [time]"
+    .replace(/([A-Za-z().\s]+)\s+\[\d{1,2}:\d{2}\s?(AM|PM)\]/g, "\n$1 [$2")
+
+    // Put newline AFTER time block
+    .replace(/\[(\d{1,2}:\d{2}\s?(AM|PM))\]/g, "[$1]\n")
+
+    // Put newline BEFORE arrows if missing
+    .replace(/(->)/g, "\n$1")
+
+    // Remove accidental double spaces
+    .replace(/[ \t]+/g, " ")
+
+    // Clean multiple newlines
+    .replace(/\n{2,}/g, "\n")
+    .trim();
+}
+
+
+
 export function parseMarkdownReport(input, date) {
+  input = normalizeSlackText(input);
+
   const lines = input.trim().split("\n");
 
   const nameOrder = [
