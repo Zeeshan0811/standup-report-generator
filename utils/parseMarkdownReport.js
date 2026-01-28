@@ -1,18 +1,33 @@
-function normalizeSlackText(raw) {
+function normalizeSlackText(nameOrder, raw) {
+  if (!raw) return "";
+  raw = String(raw).replace(/\u00A0/g, " ");
+
+  const escapedNames = nameOrder
+    .map(n => n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("|");
+
+  // 1️⃣ Break when first name glued to text
+  const firstNames = nameOrder.map(n => n.split(" ")[0]);
+  const firstNameRegex = new RegExp(`([a-zA-Z])(${firstNames.join("|")})`, "g");
+  raw = raw.replace(firstNameRegex, "$1\n$2");
+
+  // 2️⃣ Break when full name appears mid sentence before [time]
+  const midSentenceNameRegex = new RegExp(
+    `(?<!@)\\s(${escapedNames})\\s*(?=\\[\\d{1,2}:\\d{2}\\s?(AM|PM)\\])`,
+    "g"
+  );
+  raw = raw.replace(midSentenceNameRegex, "\n$1 ");
+
+  // 3️⃣ Standard Name [time] handling
+  const nameTimeRegex = new RegExp(
+    `(?<!@)(${escapedNames})\\s*(\\[\\d{1,2}:\\d{2}\\s?(AM|PM)\\])`,
+    "g"
+  );
+
   return raw
-    // Put newline BEFORE every "Name  [time]"
-    .replace(/([A-Za-z().\s]+)\s+\[\d{1,2}:\d{2}\s?(AM|PM)\]/g, "\n$1 [$2")
-
-    // Put newline AFTER time block
-    .replace(/\[(\d{1,2}:\d{2}\s?(AM|PM))\]/g, "[$1]\n")
-
-    // Put newline BEFORE arrows if missing
-    .replace(/(->)/g, "\n$1")
-
-    // Remove accidental double spaces
+    .replace(nameTimeRegex, "\n$1 $2")
+    .replace(/(\[\d{1,2}:\d{2}\s?(AM|PM)\])/g, "$1\n")
     .replace(/[ \t]+/g, " ")
-
-    // Clean multiple newlines
     .replace(/\n{2,}/g, "\n")
     .trim();
 }
@@ -20,10 +35,6 @@ function normalizeSlackText(raw) {
 
 
 export function parseMarkdownReport(input, date) {
-  input = normalizeSlackText(input);
-
-  const lines = input.trim().split("\n");
-
   const nameOrder = [
     "Shafin Junayed",
     "Shad",
@@ -39,6 +50,9 @@ export function parseMarkdownReport(input, date) {
     "Anisur Rahman (Shahin)",
     "Amin"
   ];
+
+  input = normalizeSlackText(nameOrder, input);
+  const lines = input.trim().split("\n");
 
   const userData = [];
   const userNoData = [];

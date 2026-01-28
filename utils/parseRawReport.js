@@ -24,9 +24,9 @@ export function parseRawReport(input, dateFromUser) {
       result[currentPerson].push(`${currentSection}`);
       continue;
     }
-    if (line.startsWith('->')) {
-      result[currentPerson].push(`${line}`);
-    }
+    // if (line.startsWith('->')) {
+    //   result[currentPerson].push(`${line}`);
+    // }
   }
 
   const date = dateFromUser || extractedDate || new Date().toLocaleDateString('en-GB');
