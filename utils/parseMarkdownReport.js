@@ -48,7 +48,8 @@ export function parseMarkdownReport(input, date) {
     "Safwan",
     "Jalish Mahmud",
     "Anisur Rahman (Shahin)",
-    "Amin"
+    "Amin",
+    "Farhan"
   ];
 
   input = normalizeSlackText(nameOrder, input);
