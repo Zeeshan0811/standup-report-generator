@@ -37,10 +37,18 @@ const Header = () => {
                         </li>
                         <li className="nav-item mx-1">
                             <Link
-                                href="/standup-report"
+                                href="/standup-report-bbs"
                                 className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light"
                             >
-                                <i className="bi bi-clipboard-check me-1"></i> Stand-Up Report
+                                <i className="bi bi-clipboard-check me-1"></i> Stand-Up Report (BBS)
+                            </Link>
+                        </li>
+                        <li className="nav-item mx-1">
+                            <Link
+                                href="/standup-report-bbs-cms"
+                                className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light"
+                            >
+                                <i className="bi bi-clipboard-check me-1"></i> Stand-Up Report (BBS-CMS)
                             </Link>
                         </li>
                         <li className="nav-item mx-1">

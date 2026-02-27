@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { parseMarkdownReport } from '../utils/parseMarkdownReport';
 import { parseRawReport } from '../utils/parseRawReport';
 
-const StandUpReportGenerator = () => {
+const StandUpReportGenerator = ({ type, name_list }) => {
     const [input, setInput] = useState('');
     const [reportCount, setReportCount] = useState(0);
     const [nameOrder, setNameOrder] = useState([]);
@@ -21,7 +21,8 @@ const StandUpReportGenerator = () => {
     const handleGenerate = async () => {
         const raw = parseRawReport(input, date);
         // const markdown = parseMarkdownReport(input, date);
-        const { nameOrder, markdown, userNoData } = parseMarkdownReport(input, date);
+        console.log("yaa yaa names: ", name_list);
+        const { nameOrder, markdown, userNoData } = parseMarkdownReport(type, name_list, input, date);
         setRawOutput(raw);
         setNameOrder(nameOrder);
         setMarkdownOutput(markdown);

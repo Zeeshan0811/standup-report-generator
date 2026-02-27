@@ -77,23 +77,28 @@ function breakNameLines(nameOrder, input) {
   return input.replace(nameTimeRegex, "\n$1");
 }
 
-export function parseMarkdownReport(input, date) {
-  const nameOrder = [
-    "Shafin Junayed",
-    "Shad",
-    "Shahriar Ahmed Shawon",
-    "Nafis Nawal Nahiyan",
-    "Satadip",
-    "Naznin",
-    "David",
-    "Zeeshan",
-    "Muhiminul ( Apon )",
-    "Safwan",
-    "Jalish Mahmud",
-    "Anisur Rahman (Shahin)",
-    "Amin",
-    "Farhan Mullick"
-  ];
+export function parseMarkdownReport(type, nameOrder, input, date) {
+  // const nameOrder = name_list.name_list;
+  // console.log("name_list:", nameOrder);
+
+  // const nameOrder = [
+  //   "Shafin Junayed",
+  //   "Shad",
+  //   "Shahriar Ahmed Shawon",
+  //   "Nafis Nawal Nahiyan",
+  //   "Satadip",
+  //   "Naznin",
+  //   "David",
+  //   "Zeeshan",
+  //   "Muhiminul ( Apon )",
+  //   "Safwan",
+  //   "Jalish Mahmud",
+  //   "Anisur Rahman (Shahin)",
+  //   "Amin",
+  //   "Farhan Mullick"
+  // ];
+
+  console.log("Original Input:\n", nameOrder);
 
   input = normalizeSlackText(nameOrder, input);
   input = breakNameLines(nameOrder, input);
@@ -128,13 +133,14 @@ export function parseMarkdownReport(input, date) {
   const numberOnlyRegex = /^\d+$/;
 
   lines.forEach((line) => {
-    const trimmedLine = line.trim();
+    let trimmedLine = line.trim();
 
     // Skip lines that are timestamps, empty, or contain only emojis/numbers
     if (
       unwantedLineRegex.test(trimmedLine) ||                                                                                           // Skip time lines like "Today at 9:10 AM"
       line.includes(':headphones:') ||
-      line.match(/^Today at/) || line.match(/^Just now/) || line.match(/^ Just now/) || line === '' || line.includes('edited') || line == 'New' ||     // Ignore timestamps
+      line.match(/^Today at/) || line.match(/^Just now/) || line.match(/^ Just now/) || line === '' || line == 'New' ||     // Ignore timestamps
+      // line.includes('(edited)') ||                                                                                                  // Skip "(edited)" lines
       timePattern.test(trimmedLine) ||                                                                                                  // Skip time lines like "Today at 9:10 AM"
       relativeTimeRegex.test(trimmedLine) ||
       dateRegex.test(trimmedLine) ||
@@ -144,7 +150,13 @@ export function parseMarkdownReport(input, date) {
       return;
     }
 
+    // line.includes('edited')
+
     // console.log(`Processing line: ${trimmedLine}`);
+
+    // trimmedLine = line.includes('(edited)') ? line.replace('(edited)', '').trim() : line;
+
+    trimmedLine = trimmedLine.replace('(edited)', '').trim();       // Remove "(edited)" if present
 
     const nameLineMatch = nameOrder.find((name) =>
       trimmedLine.startsWith(name)
@@ -164,7 +176,14 @@ export function parseMarkdownReport(input, date) {
     : "DD/MM/YYYY";
 
   // let result = `Stand Up Report [BBS]\n${reportDate}\n\n@Kengo Otsuka san, The stand-up report for today\n\n`;
-  let result = `*Stand Up Report [BBS]*\n*${reportDate}*\n\n*@Kengo Otsuka San*,\n*@Yusei Kumoi San,*\n\n*The stand-up report for today*\n\n`;
+
+  if (type === "bbs") {
+    var result = `*Stand Up Report [BBS]*\n*${reportDate}*\n\n*@Kengo Otsuka San*,\n*@Yusei Kumoi San,*\n\n*The stand-up report for today*\n\n`;
+  } else if (type === "bbs-cms") {
+    var result = `*Stand Up Report [BBS-CMS]*\n*${reportDate}*\n\n*@Kengo Otsuka San*,*\n\n*The stand-up report for today*\n\n`;
+  } else {
+    var result = `*Stand Up Report*\n*${reportDate}*\n\n*@Kengo Otsuka San*,\n*@Yusei Kumoi San,*\n\n*The stand-up report for today*\n\n`;
+  }
 
   nameOrder.forEach((name) => {
     let name_to_array = name.split(" ");
