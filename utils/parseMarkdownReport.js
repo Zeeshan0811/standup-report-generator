@@ -180,7 +180,7 @@ export function parseMarkdownReport(type, nameOrder, input, date) {
   if (type === "bbs") {
     var result = `*Stand Up Report [BBS]*\n*${reportDate}*\n\n*@Kengo Otsuka San*,\n*@Yusei Kumoi San,*\n\n*The stand-up report for today*\n\n`;
   } else if (type === "bbs-cms") {
-    var result = `*Stand Up Report [BBS-CMS]*\n*${reportDate}*\n\n*@Kengo Otsuka San*,*\n\n*The stand-up report for today*\n\n`;
+    var result = `*Stand Up Report [BBS-CMS]*\n*${reportDate}*\n\n*@Kengo Otsuka San*,\n\n*The stand-up report for today*\n\n`;
   } else {
     var result = `*Stand Up Report*\n*${reportDate}*\n\n*@Kengo Otsuka San*,\n*@Yusei Kumoi San,*\n\n*The stand-up report for today*\n\n`;
   }
