@@ -5,7 +5,7 @@ const standup_report_bbs_cms = () => {
     const nameOrder = [
         "Zeeshan",
         "Md. Kamrul Haque",
-        "Athiqul Hasan Momin ",
+        "Athiqul",
         "Muhiminul ( Apon )",
         "Farhan Mullick",
         "Md. Anik Rahman",
