@@ -189,6 +189,10 @@ export function parseMarkdownReport(type, nameOrder, input, date) {
     let name_to_array = name.split(" ");
     let first_name = name_to_array[0];
 
+    if (first_name.includes("Md.")) {
+      first_name = name_to_array[1];
+    }
+
     if (userData[name]) {
       result += `@${first_name}\n`;
       result += "```\n";
