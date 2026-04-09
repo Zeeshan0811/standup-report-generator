@@ -19,7 +19,7 @@ const Home = () => {
           <div className="row justify-content-center g-4">
 
             {/* <!-- Daily Report Generator --> */}
-            <div className="col-md-5">
+            <div className="col-md-4">
               <div className="card tool-card h-100">
                 <div className="card-body text-center p-4">
                   <div className="mb-3">
@@ -27,31 +27,47 @@ const Home = () => {
                   </div>
                   <h5 className="card-title fw-bold">Daily Report Generator</h5>
                   <p className="card-text text-muted">
-                    Generate and organize your daily work reports effortlessly.
+                    Generate your daily work reports effortlessly.
                   </p>
                   <a href="/daily-report" className="btn btn-primary">Open Tool</a>
                 </div>
               </div>
             </div>
 
-            {/* <!-- Stand Up Report Generator --> */}
-            <div className="col-md-5">
+            {/* <!-- Stand Up Report Generator - BBS --> */}
+            <div className="col-md-4">
+              <div className="card tool-card h-100">
+                <div className="card-body text-center p-4">
+                  <div className="mb-3">
+                    <i className="bi bi-clipboard-check display-5 text-danger"></i>
+                  </div>
+                  <h5 className="card-title fw-bold">Stand Up Report (BBS)</h5>
+                  <p className="card-text text-muted">
+                    Quickly create structured team stand-up reports.
+                  </p>
+                  <a href="/standup-report-bbs" className="btn btn-danger">Open Tool</a>
+                </div>
+              </div>
+            </div>
+
+            {/* <!-- Stand Up Report Generator - BBS-CMS --> */}
+            <div className="col-md-4">
               <div className="card tool-card h-100">
                 <div className="card-body text-center p-4">
                   <div className="mb-3">
                     <i className="bi bi-clipboard-check display-5 text-success"></i>
                   </div>
-                  <h5 className="card-title fw-bold">Stand Up Report Generator</h5>
+                  <h5 className="card-title fw-bold">Stand Up Report (BBS-CMS)</h5>
                   <p className="card-text text-muted">
                     Quickly create structured team stand-up reports.
                   </p>
-                  <a href="/standup-report" className="btn btn-success">Open Tool</a>
+                  <a href="/standup-report-bbs-cms" className="btn btn-success text-white">Open Tool</a>
                 </div>
               </div>
             </div>
 
             {/* <!-- Markdown Editor --> */}
-            <div className="col-md-5">
+            <div className="col-md-4">
               <div className="card tool-card h-100">
                 <div className="card-body text-center p-4">
                   <div className="mb-3">
@@ -69,7 +85,7 @@ const Home = () => {
             </div>
 
             {/* <!-- JSON Beautifier --> */}
-            <div className="col-md-5">
+            <div className="col-md-4">
               <div className="card tool-card h-100">
                 <div className="card-body text-center p-4">
                   <div className="mb-3">
