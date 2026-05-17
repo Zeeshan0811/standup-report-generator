@@ -4,9 +4,9 @@ import StandUpReportGenerator from "/components/StandUpReportGenerator";
 const standup_report_bbs_cms = () => {
     const nameOrder = [
         "Zeeshan",
+        "Muhiminul ( Apon )",
         "Md. Kamrul Haque",
         "Athiqul",
-        "Muhiminul ( Apon )",
         "Farhan Mullick",
         "Md. Anik Rahman",
     ];
