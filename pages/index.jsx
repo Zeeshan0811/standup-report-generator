@@ -66,6 +66,24 @@ const Home = () => {
               </div>
             </div>
 
+            {/* <!-- Notes App --> */}
+            <div className="col-md-4">
+              <div className="card tool-card h-100">
+                <div className="card-body text-center p-4">
+                  <div className="mb-3">
+                    <i className="bi bi-sticky-fill display-5 text-success"></i>
+                  </div>
+                  <h5 className="card-title fw-bold">Quick Notes</h5>
+                  <p className="card-text text-muted">
+                    Note  down ideas, create checklists, and keep your thoughts organized in one place.
+                  </p>
+                  <a href="/notes" className="btn btn-success px-4">
+                    Open Tool
+                  </a>
+                </div>
+              </div>
+            </div>
+
             {/* <!-- Markdown Editor --> */}
             <div className="col-md-4">
               <div className="card tool-card h-100">

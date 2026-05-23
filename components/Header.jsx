@@ -52,6 +52,12 @@ const Header = () => {
                             </Link>
                         </li>
                         <li className="nav-item mx-1">
+                            <Link href="/notes"
+                                className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light">
+                                <i className="bi bi-sticky-fill  me-1"></i> Notes
+                            </Link>
+                        </li>
+                        <li className="nav-item mx-1">
                             <Link
                                 href="/markdown-editor"
                                 className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light"
