@@ -4,17 +4,6 @@
 import React, { useState, useEffect } from 'react';
 
 // Available note colors (modern pastel palette)
-// const NOTE_COLORS = [
-//     '#ffffff', // White
-//     '#fef3c7', // Soft Yellow
-//     '#fce7f3', // Soft Pink
-//     '#e0f2fe', // Soft Blue
-//     '#dcfce7', // Soft Green
-//     '#f3e8ff', // Soft Purple
-//     '#ffe4e6', // Soft Rose
-//     '#c3eb8e', // Slate
-// ];
-
 const NOTE_COLORS = [
     '#ffffff',     // White
     '#fef3c7',     // Soft Yellow
@@ -319,7 +308,6 @@ export default function Notes() {
                 }}
             >
                 <div className="modal-dialog modal-dialog-centered modal-lg">
-                    {/* <div className="modal-content rounded-4 border-0 shadow-lg bg-{formColor}"> */}
                     <div className="modal-content rounded-4 border-0 shadow-lg" style={{ backgroundColor: formColor }}>
                         <div className="modal-header border-0 pb-0">
                             <h5 className="modal-title fs-3 fw-semibold">
