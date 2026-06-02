@@ -120,6 +120,24 @@ const Home = () => {
               </div>
             </div>
 
+            {/* <!-- Table to Markdown --> */}
+            <div className="col-md-4">
+              <div className="card tool-card h-100">
+                <div className="card-body text-center p-4">
+                  <div className="mb-3">
+                    <i className="bi bi-table display-5 text-success"></i>
+                  </div>
+                  <h5 className="card-title fw-bold">Table to Markdown</h5>
+                  <p className="card-text text-muted">
+                    Convert HTML tables to Markdown format instantly .
+                  </p>
+                  <a href="/table-to-markdown" className="btn btn-success text-white px-4">
+                    Open Tool
+                  </a>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
