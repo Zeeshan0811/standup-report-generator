@@ -197,7 +197,7 @@ const TableToMarkdownConverter = () => {
                         Table to Markdown Converter
                     </h3>
                     <p className="lead">
-                        Paste any HTML table and get instant Markdown format
+                        Paste any table and get instant Markdown format
                     </p>
                 </div>
 
@@ -211,7 +211,7 @@ const TableToMarkdownConverter = () => {
                                     <div>
                                         <i className="bi bi-table me-2 text-primary"></i>
                                         <h5 className="card-title mb-0 fw-semibold d-inline-block">
-                                            HTML Table Input
+                                            Table Input
                                         </h5>
                                     </div>
                                     <button
@@ -233,7 +233,7 @@ const TableToMarkdownConverter = () => {
                                     value={inputValue}
                                     onChange={handleInputChange}
                                     onPaste={handlePaste}
-                                    placeholder="Paste your HTML table here... (Ctrl+V)"
+                                    placeholder="Paste your table here... (Ctrl+V)"
                                     rows={15}
                                     style={{
                                         resize: 'vertical',
