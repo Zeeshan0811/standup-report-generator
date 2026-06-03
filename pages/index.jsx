@@ -129,7 +129,7 @@ const Home = () => {
                   </div>
                   <h5 className="card-title fw-bold">Table to Markdown</h5>
                   <p className="card-text text-muted">
-                    Convert HTML tables to Markdown format instantly .
+                    Convert tables to Markdown format instantly .
                   </p>
                   <a href="/table-to-markdown" className="btn btn-success text-white px-4">
                     Open Tool
