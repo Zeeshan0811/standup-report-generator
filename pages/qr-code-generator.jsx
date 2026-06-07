@@ -90,16 +90,16 @@ const QRCodeGenerator = () => {
     };
 
     // Auto-generate when relevant data changes
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            const finalValue = getCurrentValue();
-            if (finalValue && finalValue.trim()) {
-                generateQR();
-            }
-        }, 500);
+    // useEffect(() => {
+    //     const timer = setTimeout(() => {
+    //         const finalValue = getCurrentValue();
+    //         if (finalValue && finalValue.trim()) {
+    //             generateQR();
+    //         }
+    //     }, 500);
 
-        return () => clearTimeout(timer);
-    }, [qrType, inputValue, wifiData, vcardData, eventData, locationData, whatsappData, cryptoData, socialData, qrSize, qrColor, bgColor, margin, errorCorrection]);
+    //     return () => clearTimeout(timer);
+    // }, [qrType, inputValue, wifiData, vcardData, eventData, locationData, whatsappData, cryptoData, socialData, qrSize, qrColor, bgColor, margin, errorCorrection]);
 
     // Templates - each template knows exactly what to set
     const templates = {
@@ -929,7 +929,8 @@ const QRCodeGenerator = () => {
                         <div className="card-body py-2">
                             <small className="text-muted">
                                 <i className="bi bi-check-circle-fill text-success me-1"></i>
-                                <strong>Auto-generates:</strong> QR updates automatically when you change any setting or input.
+                                {/* <strong>Auto-generates:</strong> QR updates automatically when you change any setting or input. */}
+                                <strong>Template:</strong> Use templates to quickly generate QR codes for common use cases.
                             </small>
                         </div>
                     </div>
