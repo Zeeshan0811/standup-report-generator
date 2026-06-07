@@ -77,6 +77,12 @@ const Header = () => {
                                 <i className="bi bi-braces me-1"></i> JSON Beautifier
                             </Link>
                         </li>
+                        <li className="nav-item mx-1">
+                            <Link href="/qr-code-generator"
+                                className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light">
+                                <i className="bi bi-qr-code me-1"></i> QR Code
+                            </Link>
+                        </li>
                     </ul>
                 </div>
             </div>

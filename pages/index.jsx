@@ -138,6 +138,24 @@ const Home = () => {
               </div>
             </div>
 
+            {/* <!-- QR Code Generator --> */}
+            <div className="col-md-4">
+              <div className="card tool-card h-100">
+                <div className="card-body text-center p-4">
+                  <div className="mb-3">
+                    <i className="bi bi-qr-code display-5 text-info"></i>
+                  </div>
+                  <h5 className="card-title fw-bold">QR Code Generator</h5>
+                  <p className="card-text text-muted">
+                    Create custom QR codes for links, text, and more.
+                  </p>
+                  <a href="/qr-code-generator" className="btn btn-info text-white px-4">
+                    Open Tool
+                  </a>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
