@@ -58,6 +58,69 @@ const TableToMarkdownConverter = () => {
         }
     };
 
+    // Convert Markdown table to HTML
+    const convertMarkdownToHtml = (markdown) => {
+        if (!markdown.trim()) return '<p class="text-muted">No markdown content to preview</p>';
+
+        try {
+            const lines = markdown.trim().split('\n');
+            if (lines.length < 2) {
+                return '<p class="text-warning">Invalid markdown table format</p>';
+            }
+
+            let html = '<table class="table table-bordered table-striped">\n';
+
+            // Process each row
+            lines.forEach((line, index) => {
+                // Skip separator line but use it to determine if we're in header
+                if (line.includes('---')) return;
+
+                const cells = line.split('|')
+                    .filter(cell => cell.trim() !== '')
+                    .map(cell => cell.trim());
+
+                if (cells.length === 0) return;
+
+                // Check if previous line was a separator (header row)
+                const isHeader = index > 0 && lines[index - 1] && lines[index - 1].includes('---');
+
+                if (isHeader) {
+                    html += '  <thead>\n';
+                    html += '    <tr>\n';
+                    cells.forEach(cell => {
+                        html += `      <th>${escapeHtml(cell)}</th>\n`;
+                    });
+                    html += '    </tr>\n';
+                    html += '  </thead>\n';
+                } else {
+                    if (index === 0 || (index > 0 && !lines[index - 1].includes('---'))) {
+                        html += '  <tbody>\n';
+                    }
+                    html += '    <tr>\n';
+                    cells.forEach(cell => {
+                        html += `      <td>${escapeHtml(cell)}</td>\n`;
+                    });
+                    html += '    </tr>\n';
+                    if (index === lines.length - 1 || (index < lines.length - 1 && lines[index + 1].includes('---'))) {
+                        html += '  </tbody>\n';
+                    }
+                }
+            });
+
+            html += '</table>';
+            return html;
+        } catch (err) {
+            return '<p class="text-danger">Error parsing markdown table</p>';
+        }
+    };
+
+    // Helper function to escape HTML
+    const escapeHtml = (text) => {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    };
+
     // Handle paste event
     const handlePaste = useCallback((e) => {
         const pastedText = e.clipboardData.getData('text/html') ||
@@ -96,6 +159,12 @@ const TableToMarkdownConverter = () => {
         } else {
             setMarkdownOutput('');
         }
+    };
+
+    // Handle markdown editing
+    const handleMarkdownChange = (e) => {
+        const newMarkdown = e.target.value;
+        setMarkdownOutput(newMarkdown);
     };
 
     // Copy markdown to clipboard
@@ -188,150 +257,161 @@ const TableToMarkdownConverter = () => {
 
     return (
         <div className="container-fluid bg-gradient" style={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            minHeight: '100vh'
         }}>
-            <div className="container py-3">
-                {/* Header */}
-                <div className="text-center mb-3">
-                    <h3 className="fw-bold mb-3">
-                        Table to Markdown Converter
-                    </h3>
-                    <p className="lead">
-                        Paste any table and get instant Markdown format
-                    </p>
-                </div>
+            {/* Header */}
+            <div className="text-center mb-3 pt-3">
+                <h3 className="fw-bold mb-3">
+                    Table to Markdown Converter
+                </h3>
+                <p className="lead">
+                    Copy and Paste any table to convert into Markdown and see live preview
+                </p>
+            </div>
 
-                {/* Main Content */}
-                <div className="row g-4">
-                    {/* Left Column - Input */}
-                    <div className="col-md-6">
-                        <div className="card shadow-lg border-0 rounded-4 h-100">
-                            <div className="card-header bg-white border-0 pt-4 px-4">
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <i className="bi bi-table me-2 text-primary"></i>
-                                        <h5 className="card-title mb-0 fw-semibold d-inline-block">
-                                            Table Input
-                                        </h5>
-                                    </div>
-                                    <button
-                                        onClick={resetAll}
-                                        className="btn btn-outline-danger btn-sm rounded-pill px-3"
-                                        title="Reset all"
-                                    >
-                                        <i className="bi bi-arrow-repeat me-1"></i>
-                                        Reset
-                                    </button>
+            {/* Main Content - 3 Columns */}
+            <div className="row g-4">
+                {/* Column 1 - Table Input */}
+                <div className="col-md-4">
+                    <div className="card shadow-lg border-0 rounded-4 h-100">
+                        <div className="card-header bg-white border-0 pt-4 px-4">
+                            <div className="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i className="bi bi-table me-2 text-primary"></i>
+                                    <h5 className="card-title mb-0 fw-semibold d-inline-block">
+                                        Table Input
+                                    </h5>
                                 </div>
-                                <p className="text-muted small mt-2 mb-0">
-                                    Copy a table from Excel, Word, or web page and paste below
-                                </p>
+                                <button
+                                    onClick={resetAll}
+                                    className="btn btn-outline-danger btn-sm rounded-pill px-3"
+                                    title="Reset all"
+                                >
+                                    <i className="bi bi-arrow-repeat me-1"></i>
+                                    Reset
+                                </button>
                             </div>
-                            <div className="card-body p-4">
-                                <textarea
-                                    className="form-control font-monospace"
-                                    value={inputValue}
-                                    onChange={handleInputChange}
-                                    onPaste={handlePaste}
-                                    placeholder="Paste your table here... (Ctrl+V)"
-                                    rows={15}
-                                    style={{
-                                        resize: 'vertical',
-                                        fontFamily: 'monospace',
-                                        fontSize: '14px',
-                                        lineHeight: '1.5'
-                                    }}
-                                />
+                            <p className="text-muted small mt-2 mb-0">
+                                Copy a table from Excel, Word, or web page and paste below
+                            </p>
+                        </div>
+                        <div className="card-body p-4">
+                            <textarea
+                                className="form-control font-monospace"
+                                value={inputValue}
+                                onChange={handleInputChange}
+                                onPaste={handlePaste}
+                                placeholder="Paste your table here... (Ctrl+V)"
+                                rows={15}
+                                style={{
+                                    resize: 'vertical',
+                                    fontFamily: 'monospace',
+                                    fontSize: '14px',
+                                    lineHeight: '1.5'
+                                }}
+                            />
 
-                                {error && (
-                                    <div className="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-                                        <i className="bi bi-exclamation-triangle-fill me-2"></i>
-                                        {error}
-                                        <button type="button" className="btn-close" data-bs-dismiss="alert" onClick={() => setError('')}></button>
-                                    </div>
-                                )}
-
-                                <div className="mt-3">
-                                    <button
-                                        onClick={loadExample}
-                                        className="btn btn-outline-primary btn-sm"
-                                    >
-                                        <i className="bi bi-file-earmark-text me-1"></i>
-                                        Load Example
-                                    </button>
-                                    <small className="text-muted ms-3">
-                                        <i className="bi bi-info-circle"></i> Supports complex tables with merged cells
-                                    </small>
+                            {error && (
+                                <div className="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                                    <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                                    {error}
+                                    <button type="button" className="btn-close" data-bs-dismiss="alert" onClick={() => setError('')}></button>
                                 </div>
+                            )}
+
+                            <div className="mt-3">
+                                <button
+                                    onClick={loadExample}
+                                    className="btn btn-outline-primary btn-sm"
+                                >
+                                    <i className="bi bi-file-earmark-text me-1"></i>
+                                    Load Example
+                                </button>
+                                <small className="text-muted ms-3">
+                                    <i className="bi bi-info-circle"></i> Supports complex tables
+                                </small>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {/* Right Column - Output */}
-                    <div className="col-md-6">
-                        <div className="card shadow-lg border-0 rounded-4 h-100">
-                            <div className="card-header bg-white border-0 pt-4 px-4">
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <i className="bi bi-markdown me-2 text-success"></i>
-                                        <h5 className="card-title mb-0 fw-semibold d-inline-block">
-                                            Markdown Output
-                                        </h5>
-                                    </div>
-                                    <button
-                                        id="copyBtn"
-                                        onClick={copyToClipboard}
-                                        className="btn btn-success btn-sm rounded-pill px-3"
-                                        disabled={!markdownOutput}
-                                    >
-                                        <i className="bi bi-clipboard-check me-1"></i>
-                                        Copy
-                                    </button>
+                {/* Column 2 - Markdown Output (Editable) */}
+                <div className="col-md-4">
+                    <div className="card shadow-lg border-0 rounded-4 h-100">
+                        <div className="card-header bg-white border-0 pt-4 px-4">
+                            <div className="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i className="bi bi-markdown me-2 text-success"></i>
+                                    <h5 className="card-title mb-0 fw-semibold d-inline-block">
+                                        Markdown Output
+                                    </h5>
                                 </div>
-                                <p className="text-muted small mt-2 mb-0">
-                                    Live Markdown table ready to use in GitHub, GitLab, or any Markdown editor
-                                </p>
+                                <button
+                                    id="copyBtn"
+                                    onClick={copyToClipboard}
+                                    className="btn btn-success btn-sm rounded-pill px-3"
+                                    disabled={!markdownOutput}
+                                >
+                                    <i className="bi bi-clipboard-check me-1"></i>
+                                    Copy
+                                </button>
                             </div>
-                            <div className="card-body p-4">
-                                {markdownOutput ? (
-                                    <div className="position-relative">
-                                        <pre className="bg-light p-3 rounded-3 border" style={{
-                                            minHeight: '300px',
-                                            maxHeight: '400px',
-                                            overflow: 'auto',
-                                            fontFamily: 'monospace',
-                                            fontSize: '14px',
-                                            lineHeight: '1.5'
-                                        }}>
-                                            <code>{markdownOutput}</code>
-                                        </pre>
+                            <p className="text-muted small mt-2 mb-0">
+                                Editable Markdown - changes will reflect in the preview
+                            </p>
+                        </div>
+                        <div className="card-body p-4">
+                            <textarea
+                                className="form-control font-monospace"
+                                value={markdownOutput}
+                                onChange={handleMarkdownChange}
+                                placeholder="Markdown will appear here... You can edit it directly"
+                                rows={15}
+                                style={{
+                                    resize: 'vertical',
+                                    fontFamily: 'monospace',
+                                    fontSize: '14px',
+                                    lineHeight: '1.5'
+                                }}
+                            />
+                            {!markdownOutput && (
+                                <div className="text-center py-3 text-muted mt-2">
+                                    <small>Paste a table on the left to generate markdown</small>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
 
-                                        {/* Preview Section */}
-                                        <div className="mt-4">
-                                            <div className="d-flex align-items-center mb-2">
-                                                <i className="bi bi-eye-fill me-2 text-info"></i>
-                                                <h6 className="mb-0 fw-semibold">Preview</h6>
-                                                <small className="text-muted ms-2">How it will look in Markdown</small>
-                                            </div>
-                                            <div className="table-responsive border rounded-3 p-3 bg-white">
-                                                <div className="font-monospace small">
-                                                    {markdownOutput.split('\n').map((line, index) => (
-                                                        <div key={index} className="py-1">
-                                                            {line}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="text-center py-5 text-muted">
-                                        <i className="bi bi-table display-1"></i>
-                                        <p className="mt-3">Paste a table on the left to see Markdown output here</p>
-                                        <small>Try copying a table from Excel or any website with a table</small>
-                                    </div>
-                                )}
+                {/* Column 3 - Actual Output (HTML Preview) */}
+                <div className="col-md-4">
+                    <div className="card shadow-lg border-0 rounded-4 h-100">
+                        <div className="card-header bg-white border-0 pt-4 px-4">
+                            <div>
+                                <i className="bi bi-eye-fill me-2 text-info"></i>
+                                <h5 className="card-title mb-0 fw-semibold d-inline-block">
+                                    Actual Output
+                                </h5>
                             </div>
+                            <p className="text-muted small mt-2 mb-0">
+                                Live HTML table preview
+                            </p>
+                        </div>
+                        <div className="card-body p-4">
+                            <div className="table-responsive bg-light p-3 rounded-3 border" style={{
+                                minHeight: '300px',
+                                maxHeight: '400px',
+                                overflow: 'auto'
+                            }}>
+                                <div dangerouslySetInnerHTML={{ __html: convertMarkdownToHtml(markdownOutput) }} />
+                            </div>
+                            {!markdownOutput && (
+                                <div className="text-center py-3 text-muted mt-2">
+                                    <i className="bi bi-table display-6"></i>
+                                    <p className="mt-2">Actual table preview will appear here</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
