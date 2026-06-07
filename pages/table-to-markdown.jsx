@@ -68,48 +68,76 @@ const TableToMarkdownConverter = () => {
                 return '<p class="text-warning">Invalid markdown table format</p>';
             }
 
-            let html = '<table class="table table-bordered table-striped">\n';
+            // Parse markdown table
+            const tableData = [];
+            let headerRow = null;
+            let isHeaderParsed = false;
 
-            // Process each row
-            lines.forEach((line, index) => {
-                // Skip separator line but use it to determine if we're in header
-                if (line.includes('---')) return;
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
 
+                // Skip separator lines (contains ---)
+                if (line.includes('---') && line.includes('|')) {
+                    isHeaderParsed = true;
+                    continue;
+                }
+
+                // Parse cells from the line
                 const cells = line.split('|')
-                    .filter(cell => cell.trim() !== '')
+                    .filter((cell, index) => index !== 0 && index !== line.split('|').length - 1 ? true : cell.trim() !== '')
                     .map(cell => cell.trim());
 
-                if (cells.length === 0) return;
+                if (cells.length === 0) continue;
 
-                // Check if previous line was a separator (header row)
-                const isHeader = index > 0 && lines[index - 1] && lines[index - 1].includes('---');
-
-                if (isHeader) {
-                    html += '  <thead>\n';
-                    html += '    <tr>\n';
-                    cells.forEach(cell => {
-                        html += `      <th>${escapeHtml(cell)}</th>\n`;
-                    });
-                    html += '    </tr>\n';
-                    html += '  </thead>\n';
+                if (!isHeaderParsed && headerRow === null) {
+                    // This is the header row
+                    headerRow = cells;
                 } else {
-                    if (index === 0 || (index > 0 && !lines[index - 1].includes('---'))) {
-                        html += '  <tbody>\n';
-                    }
+                    // This is a data row
+                    tableData.push(cells);
+                }
+            }
+
+            if (!headerRow || headerRow.length === 0) {
+                return '<p class="text-warning">No valid header found in markdown table</p>';
+            }
+
+            // Build HTML table
+            let html = '<table class="table table-bordered table-striped table-hover">\n';
+
+            // Add header
+            html += '  <thead class="table-dark">\n';
+            html += '    <tr>\n';
+            headerRow.forEach(cell => {
+                html += `      <th>${escapeHtml(cell)}</th>\n`;
+            });
+            html += '    </tr>\n';
+            html += '  </thead>\n';
+
+            // Add body
+            if (tableData.length > 0) {
+                html += '  <tbody>\n';
+                tableData.forEach(row => {
                     html += '    <tr>\n';
-                    cells.forEach(cell => {
+                    // Ensure each row has the same number of columns as header
+                    const rowCells = [...row];
+                    while (rowCells.length < headerRow.length) {
+                        rowCells.push('');
+                    }
+                    rowCells.forEach(cell => {
                         html += `      <td>${escapeHtml(cell)}</td>\n`;
                     });
                     html += '    </tr>\n';
-                    if (index === lines.length - 1 || (index < lines.length - 1 && lines[index + 1].includes('---'))) {
-                        html += '  </tbody>\n';
-                    }
-                }
-            });
+                });
+                html += '  </tbody>\n';
+            }
 
             html += '</table>';
             return html;
+
         } catch (err) {
+            console.error('Markdown parsing error:', err);
             return '<p class="text-danger">Error parsing markdown table</p>';
         }
     };
@@ -208,41 +236,42 @@ const TableToMarkdownConverter = () => {
 
     // Example table for demonstration
     const loadExample = () => {
-        const exampleTable = `<table class="table">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Age</th>
-      <th>City</th>
-      <th>Occupation</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>John Doe</td>
-      <td>28</td>
-      <td>New York</td>
-      <td>Software Engineer</td>
-    </tr>
-    <tr>
-      <td>Jane Smith</td>
-      <td>34</td>
-      <td>Los Angeles</td>
-      <td>Product Manager</td>
-    </tr>
-    <tr>
-      <td>Mike Johnson</td>
-      <td>45</td>
-      <td>Chicago</td>
-      <td>Data Scientist</td>
-    </tr>
-    <tr>
-      <td>Sarah Williams</td>
-      <td>31</td>
-      <td>Miami</td>
-      <td>UX Designer</td>
-    </tr>
-  </tbody>
+        const exampleTable = `<table>
+  <tr>
+    <th>Company</th>
+    <th>Contact</th>
+    <th>Country</th>
+  </tr>
+  <tr>
+    <td>Alfreds Futterkiste</td>
+    <td>Maria Anders</td>
+    <td>Germany</td>
+  </tr>
+  <tr>
+    <td>Centro comercial Moctezuma</td>
+    <td>Francisco Chang</td>
+    <td>Mexico</td>
+  </tr>
+  <tr>
+    <td>Ernst Handel</td>
+    <td>Roland Mendel</td>
+    <td>Austria</td>
+  </tr>
+  <tr>
+    <td>Island Trading</td>
+    <td>Helen Bennett</td>
+    <td>UK</td>
+  </tr>
+  <tr>
+    <td>Laughing Bacchus Winecellars</td>
+    <td>Yoshi Tannamuri</td>
+    <td>Canada</td>
+  </tr>
+  <tr>
+    <td>Magazzini Alimentari Riuniti</td>
+    <td>Giovanni Rovelli</td>
+    <td>Italy</td>
+  </tr>
 </table>`;
 
         setInputValue(exampleTable);
@@ -261,12 +290,12 @@ const TableToMarkdownConverter = () => {
             minHeight: '100vh'
         }}>
             {/* Header */}
-            <div className="text-center mb-3 pt-3">
+            <div className="text-center mb-3">
                 <h3 className="fw-bold mb-3">
                     Table to Markdown Converter
                 </h3>
                 <p className="lead">
-                    Copy and Paste any table to convert into Markdown and see live preview
+                    Paste any table here to convert into Markdown and see live preview
                 </p>
             </div>
 
@@ -391,7 +420,7 @@ const TableToMarkdownConverter = () => {
                             <div>
                                 <i className="bi bi-eye-fill me-2 text-info"></i>
                                 <h5 className="card-title mb-0 fw-semibold d-inline-block">
-                                    Actual Output
+                                    Live Preview
                                 </h5>
                             </div>
                             <p className="text-muted small mt-2 mb-0">
