@@ -40,7 +40,7 @@ const Header = () => {
                                 href="/standup-report-bbs"
                                 className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light"
                             >
-                                <i className="bi bi-clipboard-check me-1"></i> Stand-Up (BBS)
+                                <i className="bi bi-clipboard-check me-1"></i> BBS
                             </Link>
                         </li>
                         <li className="nav-item mx-1">
@@ -48,7 +48,7 @@ const Header = () => {
                                 href="/standup-report-bbs-cms"
                                 className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light"
                             >
-                                <i className="bi bi-clipboard-check me-1"></i> Stand-Up (BBS-CMS)
+                                <i className="bi bi-clipboard-check me-1"></i> BBS-CMS
                             </Link>
                         </li>
                         <li className="nav-item mx-1">
@@ -81,6 +81,12 @@ const Header = () => {
                             <Link href="/qr-code-generator"
                                 className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light">
                                 <i className="bi bi-qr-code me-1"></i> QR Code
+                            </Link>
+                        </li>
+                        <li className="nav-item mx-1">
+                            <Link href="/json-to-csv"
+                                className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light">
+                                <i className="bi bi-filetype-csv me-1"></i> JSON to CSV
                             </Link>
                         </li>
                     </ul>

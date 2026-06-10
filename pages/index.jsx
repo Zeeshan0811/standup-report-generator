@@ -156,6 +156,24 @@ const Home = () => {
               </div>
             </div>
 
+            {/* <!-- JSON to CSV Converter --> */}
+            <div className="col-md-4">
+              <div className="card tool-card h-100">
+                <div className="card-body text-center p-4">
+                  <div className="mb-3">
+                    <i className="bi bi-filetype-csv display-5 text-success"></i>
+                  </div>
+                  <h5 className="card-title fw-bold">JSON to CSV Converter</h5>
+                  <p className="card-text text-muted">
+                    Convert JSON data to CSV format for easy import into spreadsheets.
+                  </p>
+                  <a href="/json-to-csv" className="btn btn-success text-white px-4">
+                    Open Tool
+                  </a>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
