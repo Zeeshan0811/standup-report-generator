@@ -10,6 +10,7 @@ export default function JsonToCsvConverter() {
     const [fileName, setFileName] = useState('data');
     const [isLoading, setIsLoading] = useState(false);
     const [previewData, setPreviewData] = useState(null);
+    const [allData, setAllData] = useState(null);
 
     const handleConvert = () => {
         try {
@@ -31,6 +32,9 @@ export default function JsonToCsvConverter() {
                 setIsLoading(false);
                 return;
             }
+
+            // Set All Data for Download
+            setAllData(dataArray);
 
             // Set preview data
             setPreviewData(dataArray.slice(0, 5));
@@ -55,7 +59,7 @@ export default function JsonToCsvConverter() {
                 setError('No data to download');
                 return;
             }
-            const csvContent = convertJsonToCsv(previewData);
+            const csvContent = convertJsonToCsv(allData);
             downloadCsv(csvContent, fileName);
         } catch (err) {
             setError('Error downloading file: ' + err.message);
@@ -312,6 +316,9 @@ export default function JsonToCsvConverter() {
                                         <span className="badge bg-primary ms-3">
                                             {previewData.length} {previewData.length === 1 ? 'record' : 'records'} shown
                                         </span>
+                                        <span className="badge bg-danger ms-3">
+                                            Total {allData.length} {allData.length === 1 ? 'record' : 'records'} found
+                                        </span>
                                     </div>
                                     <div className="table-responsive">
                                         <table className="table table-hover table-bordered">
@@ -360,16 +367,12 @@ export default function JsonToCsvConverter() {
                                         ) : (
                                             <>
                                                 <i className="bi bi-download me-2"></i>
-                                                Download CSV
+                                                Download CSV ({allData.length} {allData.length === 1 ? 'record' : 'records'})
                                             </>
                                         )}
                                     </button>
                                 </div>
-
-
                             )}
-
-
                         </div>
                     </div>
                 </div>
