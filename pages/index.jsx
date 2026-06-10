@@ -127,9 +127,9 @@ const Home = () => {
                   <div className="mb-3">
                     <i className="bi bi-braces display-5 text-info"></i>
                   </div>
-                  <h5 className="card-title fw-bold">JSON Beautifier</h5>
+                  <h5 className="card-title fw-bold">JSON Converter</h5>
                   <p className="card-text text-muted">
-                    Format, validate, and beautify raw JSON data instantly for better readability.
+                    Validate, format, and transform JSON data with advanced CSV export options
                   </p>
                   <a href="/json-beautifier" className="btn btn-info text-white px-4">
                     Open Tool
@@ -139,7 +139,7 @@ const Home = () => {
             </div>
 
             {/* <!-- JSON to CSV Converter --> */}
-            <div className="col-md-4">
+            {/* <div className="col-md-4">
               <div className="card tool-card h-100">
                 <div className="card-body text-center p-4">
                   <div className="mb-3">
@@ -154,7 +154,7 @@ const Home = () => {
                   </a>
                 </div>
               </div>
-            </div>
+            </div> */}
 
 
 

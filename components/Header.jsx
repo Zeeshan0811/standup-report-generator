@@ -77,12 +77,12 @@ const Header = () => {
                                 <i className="bi bi-braces me-1"></i> JSON Beautifier
                             </Link>
                         </li>
-                        <li className="nav-item mx-1">
+                        {/* <li className="nav-item mx-1">
                             <Link href="/json-to-csv"
                                 className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light">
                                 <i className="bi bi-filetype-csv me-1"></i> JSON to CSV
                             </Link>
-                        </li>
+                        </li> */}
                         <li className="nav-item mx-1">
                             <Link href="/qr-code-generator"
                                 className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light">

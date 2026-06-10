@@ -2,7 +2,6 @@
 import { useState, useRef, useCallback } from "react";
 import Editor, { OnChange } from "@monaco-editor/react";
 import { Toast, ToastContainer } from "react-bootstrap";
-import { convertJsonToCsv, downloadCsv } from '../utils/jsonToCsv';
 
 
 export default function JsonBeautifier() {
@@ -45,9 +44,9 @@ export default function JsonBeautifier() {
         try {
             let parsed = JSON.parse(jsonString);
 
-            // if (sortKeys) {
-            //     parsed = sortObjectKeys(parsed);
-            // }
+            if (sortKeys) {
+                parsed = sortObjectKeys(parsed);
+            }
 
             if (minifyOutput || selectedFormat === "minify") {
                 return JSON.stringify(parsed);
@@ -188,22 +187,6 @@ export default function JsonBeautifier() {
         return rows.join('\n');
     };
 
-    const handleDownload = () => {
-        try {
-            if (!output) {
-                addToast('No JSON data to export', 'error');
-                return;
-            }
-
-            const jsonData = JSON.parse(output);
-            const csvContent = convertJsonToCsv(jsonData);
-            downloadCsv(csvContent, csvFilename);
-            // console.log('Output JSON:', csvContent);
-        } catch (err) {
-            setError('Error downloading file: ' + err.message);
-        }
-    }
-
     // Download as CSV
     const downloadAsCSV = () => {
         if (!output) {
@@ -240,7 +223,7 @@ export default function JsonBeautifier() {
     const copyOutput = () => {
         if (!output) return;
         navigator.clipboard.writeText(output);
-        addToast('Output copied to Clipboard', 'success');
+        addToast('Copied to clipboard', 'success');
     };
 
     // Download as JSON
@@ -253,51 +236,46 @@ export default function JsonBeautifier() {
         a.download = `beautified_${Date.now()}.json`;
         a.click();
         URL.revokeObjectURL(url);
+        addToast('JSON downloaded successfully', 'success');
     };
 
     // Load example data
     const loadExampleData = () => {
-        const exampleData = [
-            {
-                id: 1,
-                name: 'John Doe',
-                email: 'john@example.com',
-                age: 30,
-                city: 'New York',
-                status: 'Active',
-                joinDate: '2024-01-15'
-            },
-            {
-                id: 2,
-                name: 'Jane Smith',
-                email: 'jane@example.com',
-                age: 25,
-                city: 'Los Angeles',
-                status: 'Active',
-                joinDate: '2024-02-20'
-            },
-            {
-                id: 3,
-                name: 'Bob Johnson',
-                email: 'bob@example.com',
-                age: 35,
-                city: 'Chicago',
-                status: 'Inactive',
-                joinDate: '2024-03-10'
-            },
-            {
-                id: 4,
-                name: 'Sarah Williams',
-                email: 'sarah@example.com',
-                age: 28,
-                city: 'Miami',
-                status: 'Active',
-                joinDate: '2024-04-05'
+        const exampleData = {
+            "users": [
+                {
+                    "id": 1,
+                    "name": "John Doe",
+                    "email": "john@example.com",
+                    "address": {
+                        "street": "123 Main St",
+                        "city": "New York",
+                        "country": "USA"
+                    },
+                    "hobbies": ["reading", "gaming", "hiking"]
+                },
+                {
+                    "id": 2,
+                    "name": "Jane Smith",
+                    "email": "jane@example.com",
+                    "address": {
+                        "street": "456 Oak Ave",
+                        "city": "Los Angeles",
+                        "country": "USA"
+                    },
+                    "hobbies": ["photography", "traveling"]
+                }
+            ],
+            "metadata": {
+                "total": 2,
+                "version": "1.0",
+                "generated": new Date().toISOString()
             }
-        ];
+        };
         const jsonString = JSON.stringify(exampleData, null, 2);
         setInput(jsonString);
         beautifyJson(jsonString);
+        addToast('Example data loaded', 'info');
     };
 
     // Clear all data
@@ -306,12 +284,14 @@ export default function JsonBeautifier() {
         setOutput("");
         setError("");
         setUrlInput("");
+        addToast('All data cleared', 'info');
     };
 
     // Apply formatting options
     const applyFormatting = () => {
         if (input.trim()) {
             beautifyJson(input);
+            addToast('Formatting applied', 'success');
         }
     };
 
@@ -336,12 +316,12 @@ export default function JsonBeautifier() {
 
             <div className="container-fluid px-4 py-3">
                 {/* Header */}
-                <div className="text-center mb-2">
-                    <h3 className="fw-bold p-3">
+                <div className="text-center mb-4">
+                    <h1 className="display-5 fw-bold bg-gradient bg-primary text-white p-3 rounded-3">
                         <i className="bi bi-braces me-3"></i>
-                        JSON Beautifier
-                    </h3>
-                    <p className="text-muted">
+                        JSON Beautifier Pro
+                    </h1>
+                    <p className="text-muted mt-2">
                         Validate, format, and transform JSON data with advanced CSV export options
                     </p>
                 </div>
@@ -352,7 +332,16 @@ export default function JsonBeautifier() {
                         <div className="card shadow-sm border-0">
                             <div className="card-body">
                                 <div className="row g-2 align-items-center">
-
+                                    <div className="col-md-auto">
+                                        <button className="btn btn-primary" onClick={loadExampleData}>
+                                            <i className="bi bi-file-text me-2"></i>Example
+                                        </button>
+                                    </div>
+                                    <div className="col-md-auto">
+                                        <button className="btn btn-secondary" onClick={clearAll}>
+                                            <i className="bi bi-trash me-2"></i>Clear All
+                                        </button>
+                                    </div>
                                     <div className="col-md-auto">
                                         <label className="btn btn-outline-primary">
                                             <i className="bi bi-upload me-2"></i>Upload JSON
@@ -379,46 +368,6 @@ export default function JsonBeautifier() {
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="col-md-auto">
-                                        <button className="btn btn-primary" onClick={loadExampleData}>
-                                            <i className="bi bi-file-text me-2"></i>Example
-                                        </button>
-                                    </div>
-                                    <div className="col-md-auto">
-                                        <button className="btn btn-secondary" onClick={clearAll}>
-                                            <i className="bi bi-trash me-2"></i>Clear All
-                                        </button>
-                                    </div>
-                                    <div className="col-md-auto">
-                                        {/* <label className="form-label fw-semibold">Downloadable</label> */}
-                                        <div className="input-group">
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                value={csvFilename}
-                                                onChange={(e) => setCsvFilename(e.target.value)}
-                                                placeholder="export"
-                                            />
-                                            <span className="input-group-text">.csv</span>
-                                        </div>
-                                    </div>
-                                    {/* <div className="col-md-auto">
-                                        <div className="form-check">
-                                            <input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                id="sortKeys"
-                                                checked={sortKeys}
-                                                onChange={(e) => {
-                                                    setSortKeys(e.target.checked);
-                                                    applyFormatting();
-                                                }}
-                                            />
-                                            <label className="form-check-label" htmlFor="sortKeys">
-                                                Sort keys alphabetically
-                                            </label>
-                                        </div>
-                                    </div> */}
                                 </div>
                             </div>
                         </div>
@@ -473,39 +422,12 @@ export default function JsonBeautifier() {
                                     <i className="bi bi-check-circle me-2"></i>Beautified JSON
                                 </span>
                                 <div className="d-flex gap-2">
-                                    <div className="btn-group">
-                                        <button
-                                            className={`btn ${selectedFormat === "beautify" ? "btn-primary" : "btn-secondary"}`}
-                                            onClick={() => {
-                                                setSelectedFormat("beautify");
-                                                setMinifyOutput(false);
-                                                applyFormatting();
-                                            }}
-                                        >
-                                            <i className="bi bi-braces me-1"></i>Beautify
-                                        </button>
-                                        <button
-                                            className={`btn ${selectedFormat === "minify" ? "btn-primary" : "btn-secondary"}`}
-                                            onClick={() => {
-                                                setSelectedFormat("minify");
-                                                setMinifyOutput(true);
-                                                applyFormatting();
-                                            }}
-                                        >
-                                            <i className="bi bi-files me-1"></i>Minify
-                                        </button>
-                                    </div>
                                     <button className="btn btn-outline-light btn-sm" onClick={copyOutput} disabled={!output}>
                                         <i className="bi bi-clipboard-check me-1"></i>Copy
                                     </button>
                                     <button className="btn btn-outline-light btn-sm" onClick={downloadOutput} disabled={!output}>
                                         <i className="bi bi-download me-1"></i>JSON
                                     </button>
-                                    <button className="btn btn-outline-light btn-sm" onClick={handleDownload} disabled={!output}>
-                                        <i className="bi bi-download me-1"></i>CSV
-                                    </button>
-
-
                                 </div>
                             </div>
                             <div className="card-body p-0">
@@ -528,51 +450,126 @@ export default function JsonBeautifier() {
                     </div>
                 </div>
 
-                <div className="row justify-content-center mb-5">
-                    {/* Features Section */}
-                    <div className="mt-5 pt-3">
-                        <hr className="my-4" />
-                        <div className="row g-4">
-                            <div className="col-md-4">
-                                <div className="text-center">
-                                    <div className="mb-3">
-                                        <i className="bi bi-filetype-json fs-2 text-primary"></i>
+                {/* CSV Export Section */}
+                <div className="row mt-4">
+                    <div className="col-12">
+                        <div className="card shadow-sm border-0 bg-light">
+                            <div className="card-body">
+                                <h5 className="card-title mb-3">
+                                    <i className="bi bi-file-spreadsheet me-2 text-success"></i>
+                                    CSV Export Options
+                                </h5>
+                                <div className="row g-3 align-items-end">
+                                    <div className="col-md-3">
+                                        <label className="form-label fw-semibold">Filename</label>
+                                        <div className="input-group">
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                value={csvFilename}
+                                                onChange={(e) => setCsvFilename(e.target.value)}
+                                                placeholder="export"
+                                            />
+                                            <span className="input-group-text">.csv</span>
+                                        </div>
                                     </div>
-                                    <h6 className="fw-semibold">Multiple Formats</h6>
-                                    <small className="text-muted">
-                                        Supports JSON arrays and objects
-                                    </small>
-                                </div>
-                            </div>
-                            <div className="col-md-4">
-                                <div className="text-center">
-                                    <div className="mb-3">
-                                        <i className="bi bi-shield-check fs-2 text-success"></i>
+                                    <div className="col-md-2">
+                                        <label className="form-label fw-semibold">Delimiter</label>
+                                        <select className="form-select" value={csvDelimiter} onChange={(e) => setCsvDelimiter(e.target.value)}>
+                                            <option value=",">Comma (,)</option>
+                                            <option value=";">Semicolon (;)</option>
+                                            <option value="\t">Tab (\t)</option>
+                                            <option value="|">Pipe (|)</option>
+                                        </select>
                                     </div>
-                                    <h6 className="fw-semibold">Secure & Private</h6>
-                                    <small className="text-muted">
-                                        All conversion happens in your browser
-                                    </small>
-                                </div>
-                            </div>
-                            <div className="col-md-4">
-                                <div className="text-center">
-                                    <div className="mb-3">
-                                        <i className="bi bi-speedometer2 fs-2 text-info"></i>
+                                    <div className="col-md-2">
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                id="flattenNested"
+                                                checked={flattenNested}
+                                                onChange={(e) => setFlattenNested(e.target.checked)}
+                                            />
+                                            <label className="form-check-label" htmlFor="flattenNested">
+                                                Flatten nested objects
+                                            </label>
+                                        </div>
                                     </div>
-                                    <h6 className="fw-semibold">Fast Processing</h6>
-                                    <small className="text-muted">
-                                        Instant conversion with preview
-                                    </small>
+                                    <div className="col-md-3">
+                                        <button className="btn btn-success w-100" onClick={downloadAsCSV} disabled={!output}>
+                                            <i className="bi bi-download me-2"></i>Download as CSV
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                {/* Advanced Options */}
+                <div className="row mt-3">
+                    <div className="col-12">
+                        <div className="card shadow-sm border-0">
+                            <div className="card-body">
+                                <h5 className="card-title mb-3">
+                                    <i className="bi bi-sliders2 me-2 text-info"></i>
+                                    Advanced Formatting
+                                </h5>
+                                <div className="row g-3 align-items-center">
+                                    <div className="col-md-auto">
+                                        <div className="btn-group">
+                                            <button
+                                                className={`btn ${selectedFormat === "beautify" ? "btn-primary" : "btn-outline-primary"}`}
+                                                onClick={() => {
+                                                    setSelectedFormat("beautify");
+                                                    setMinifyOutput(false);
+                                                    applyFormatting();
+                                                }}
+                                            >
+                                                <i className="bi bi-braces me-1"></i>Beautify
+                                            </button>
+                                            <button
+                                                className={`btn ${selectedFormat === "minify" ? "btn-primary" : "btn-outline-primary"}`}
+                                                onClick={() => {
+                                                    setSelectedFormat("minify");
+                                                    setMinifyOutput(true);
+                                                    applyFormatting();
+                                                }}
+                                            >
+                                                <i className="bi bi-files me-1"></i>Minify
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-auto">
+                                        <div className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                id="sortKeys"
+                                                checked={sortKeys}
+                                                onChange={(e) => {
+                                                    setSortKeys(e.target.checked);
+                                                    applyFormatting();
+                                                }}
+                                            />
+                                            <label className="form-check-label" htmlFor="sortKeys">
+                                                Sort keys alphabetically
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-auto">
+                                        <span className="text-muted">
+                                            <i className="bi bi-info-circle me-1"></i>
+                                            {output && `${output.length.toLocaleString()} characters`}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-
         </>
     );
 }

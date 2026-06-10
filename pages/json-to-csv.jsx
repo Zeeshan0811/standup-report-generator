@@ -12,6 +12,27 @@ export default function JsonToCsvConverter() {
     const [previewData, setPreviewData] = useState(null);
     const [allData, setAllData] = useState(null);
 
+    const fetchFromUrl = async () => {
+        if (!urlInput.trim()) {
+            setError('Please enter a URL');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = await fetch(urlInput);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            const jsonString = JSON.stringify(data, null, 2);
+            setInput(jsonString);
+            beautifyJson(jsonString);
+        } catch (err) {
+            setError("Failed to fetch JSON from URL");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handleConvert = () => {
         try {
             setIsLoading(true);
@@ -60,6 +81,7 @@ export default function JsonToCsvConverter() {
                 return;
             }
             const csvContent = convertJsonToCsv(allData);
+            console.log('Output JSON:', csvContent);
             downloadCsv(csvContent, fileName);
         } catch (err) {
             setError('Error downloading file: ' + err.message);
