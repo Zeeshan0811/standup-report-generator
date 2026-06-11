@@ -339,7 +339,7 @@ export default function JsonBeautifier() {
                 <div className="text-center mb-2">
                     <h3 className="fw-bold p-3">
                         <i className="bi bi-braces me-3"></i>
-                        JSON Beautifier
+                        JSON Toolkit
                     </h3>
                     <p className="text-muted">
                         Validate, format, and transform JSON data with advanced CSV export options

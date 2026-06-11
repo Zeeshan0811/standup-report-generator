@@ -127,11 +127,11 @@ const Home = () => {
                   <div className="mb-3">
                     <i className="bi bi-braces display-5 text-info"></i>
                   </div>
-                  <h5 className="card-title fw-bold">JSON Converter</h5>
+                  <h5 className="card-title fw-bold">JSON Toolkit</h5>
                   <p className="card-text text-muted">
                     Validate, format, and transform JSON data with advanced CSV export options
                   </p>
-                  <a href="/json-beautifier" className="btn btn-info text-white px-4">
+                  <a href="/json-toolkit" className="btn btn-info text-white px-4">
                     Open Tool
                   </a>
                 </div>
