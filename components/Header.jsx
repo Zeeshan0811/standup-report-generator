@@ -89,6 +89,13 @@ const Header = () => {
                                 <i className="bi bi-qr-code me-1"></i> QR Code
                             </Link>
                         </li>
+                        <li className="nav-item mx-1">
+                            <Link href="https://tv-hub-zeta.vercel.app/" target="_blank"
+                                className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="jsx-5d89f71f57b5a1d"><circle cx="12" cy="12" r="10" class="jsx-5d89f71f57b5a1d"></circle><path d="M12 2 L12 6 M12 18 L12 22 M2 12 L6 12 M18 12 L22 12 M4.93 4.93 L7.76 7.76 M16.24 16.24 L19.07 19.07 M4.93 19.07 L7.76 16.24 M16.24 7.76 L19.07 4.93" class="jsx-5d89f71f57b5a1d"></path></svg>
+                                FIFA <span class="badge bg-danger text-light blinking_new">New</span>
+                            </Link>
+                        </li>
 
                     </ul>
                 </div>
