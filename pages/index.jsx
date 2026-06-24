@@ -145,9 +145,9 @@ const Home = () => {
                   <div className="mb-3">
                     <i className="bi bi-filetype-csv display-5 text-success"></i>
                   </div>
-                  <h5 className="card-title fw-bold">CSV - Xlxs</h5>
+                  <h5 className="card-title fw-bold">CSV Reader</h5>
                   <p className="card-text text-muted">
-                    View, search and filter spreadsheets.
+                    View, search, and convert spreadsheets.
                   </p>
                   <a href="/csv_reader" className="btn btn-success text-white px-4">
                     Open Tool
