@@ -15,6 +15,8 @@ export default function DataReader() {
     const [allColumns, setAllColumns] = useState([]);
     const [showColumnSelector, setShowColumnSelector] = useState(false);
     const [goToInput, setGoToInput] = useState('');
+    const [exportFormat, setExportFormat] = useState('csv');
+    const [exportFileName, setExportFileName] = useState('');
 
     const parseLargeCSV = useCallback((text) => {
         const lines = text.split('\n').filter(row => row.trim() !== '');
@@ -59,8 +61,8 @@ export default function DataReader() {
             columns.forEach(col => { initialVisibility[col] = true; });
             setVisibleColumns(initialVisibility);
         }
-        setTotalPages(Math.ceil(parsedData.length / rpp));
-        setDisplayData(parsedData.slice(0, rpp));
+        setTotalPages(rpp === 'all' ? 1 : Math.ceil(parsedData.length / rpp));
+        setDisplayData(rpp === 'all' ? parsedData : parsedData.slice(0, rpp));
         setLoading(false);
     }, []);
 
@@ -69,6 +71,7 @@ export default function DataReader() {
         if (!file) return;
 
         setFileName(file.name);
+        setExportFileName(file.name.replace(/\.[^/.]+$/, ''));
         setError('');
         setAllData([]);
         setFilteredData([]);
@@ -132,9 +135,9 @@ export default function DataReader() {
             );
         }
         setFilteredData(filtered);
-        setTotalPages(Math.ceil(filtered.length / rowsPerPage));
+        setTotalPages(rowsPerPage === 'all' ? 1 : Math.ceil(filtered.length / rowsPerPage));
         setCurrentPage(1);
-        setDisplayData(filtered.slice(0, rowsPerPage));
+        setDisplayData(rowsPerPage === 'all' ? filtered : filtered.slice(0, rowsPerPage));
     }, [searchTerm, allData, rowsPerPage]);
 
     const goToPage = (page) => {
@@ -145,11 +148,12 @@ export default function DataReader() {
     };
 
     const handleRowsPerPageChange = (e) => {
-        const newRowsPerPage = parseInt(e.target.value);
+        const val = e.target.value;
+        const newRowsPerPage = val === 'all' ? 'all' : parseInt(val);
         setRowsPerPage(newRowsPerPage);
-        setTotalPages(Math.ceil(filteredData.length / newRowsPerPage));
+        setTotalPages(newRowsPerPage === 'all' ? 1 : Math.ceil(filteredData.length / newRowsPerPage));
         setCurrentPage(1);
-        setDisplayData(filteredData.slice(0, newRowsPerPage));
+        setDisplayData(newRowsPerPage === 'all' ? filteredData : filteredData.slice(0, newRowsPerPage));
     };
 
     const handleGoToPage = () => {
@@ -181,6 +185,56 @@ export default function DataReader() {
         setVisibleColumns({});
         setAllColumns([]);
         setShowColumnSelector(false);
+        setExportFileName('');
+    };
+
+    const downloadBlob = (blob, name) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const handleExport = async () => {
+        if (!filteredData.length) return;
+        const cols = getVisibleColumns;
+        const rows = filteredData.map(row => {
+            const obj = {};
+            cols.forEach(col => { obj[col] = row[col] ?? ''; });
+            return obj;
+        });
+        const name = (exportFileName.trim() || fileName.replace(/\.[^/.]+$/, '') || 'export');
+
+        if (exportFormat === 'csv' || exportFormat === 'tsv') {
+            const sep = exportFormat === 'tsv' ? '\t' : ',';
+            const escape = (val) => {
+                const s = String(val);
+                return exportFormat === 'csv' && (s.includes(',') || s.includes('"') || s.includes('\n'))
+                    ? `"${s.replace(/"/g, '""')}"` : s;
+            };
+            const lines = [
+                cols.map(escape).join(sep),
+                ...rows.map(row => cols.map(col => escape(row[col])).join(sep))
+            ].join('\n');
+            const mime = exportFormat === 'tsv' ? 'text/tab-separated-values' : 'text/csv';
+            downloadBlob(new Blob([lines], { type: mime }), `${name}.${exportFormat}`);
+        } else if (exportFormat === 'json') {
+            downloadBlob(new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' }), `${name}.json`);
+        } else if (exportFormat === 'xlsx' || exportFormat === 'xls') {
+            const XLSX = await import('xlsx');
+            const ws = XLSX.utils.json_to_sheet(rows, { header: cols });
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+            XLSX.writeFile(wb, `${name}.${exportFormat}`);
+        } else if (exportFormat === 'html') {
+            const tableRows = rows.map(row =>
+                `<tr>${cols.map(col => `<td>${String(row[col]).replace(/</g, '&lt;')}</td>`).join('')}</tr>`
+            ).join('');
+            const html = `<html><head><meta charset="utf-8"></head><body><table border="1"><thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>${tableRows}</tbody></table></body></html>`;
+            downloadBlob(new Blob([html], { type: 'text/html' }), `${name}.html`);
+        }
     };
 
     const getPageNumbers = () => {
@@ -232,7 +286,15 @@ export default function DataReader() {
                         >
                             <i className="bi bi-trash me-1"></i> Clear
                         </button>
+
+
+
+
                     </div>
+
+
+
+
                     {fileName && (
                         <div className="mt-1 text-muted small">
                             <i className="bi bi-file-earmark me-1"></i>{fileName}
@@ -292,6 +354,7 @@ export default function DataReader() {
                                 <option value={100}>100 rows / page</option>
                                 <option value={500}>500 rows / page</option>
                                 <option value={1000}>1000 rows / page</option>
+                                <option value="all">Show All</option>
                             </select>
                             <button
                                 className="btn btn-outline-primary flex-shrink-0"
@@ -304,6 +367,47 @@ export default function DataReader() {
                                     {getVisibleColumns.length}/{allColumns.length}
                                 </span>
                             </button>
+
+
+
+                            {/* Export */}
+                            {filteredData.length > 0 && !loading && (
+                                < >
+                                    <div className="input-group flex-grow-1">
+                                        <span className="input-group-text">
+                                            <i className="bi bi-download"></i>
+                                        </span>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Export file name..."
+                                            value={exportFileName}
+                                            onChange={(e) => setExportFileName(e.target.value)}
+                                        />
+                                        <span className="input-group-text text-muted">.{exportFormat}</span>
+                                    </div>
+                                    <select
+                                        className="form-select flex-shrink-0"
+                                        style={{ width: '105px' }}
+                                        value={exportFormat}
+                                        onChange={(e) => setExportFormat(e.target.value)}
+                                    >
+                                        <option value="csv">CSV</option>
+                                        <option value="tsv">TSV</option>
+                                        <option value="xlsx">XLSX</option>
+                                        <option value="xls">XLS</option>
+                                        <option value="json">JSON</option>
+                                        <option value="html">HTML</option>
+                                    </select>
+                                    <button
+                                        className="btn btn-success flex-shrink-0"
+                                        onClick={handleExport}
+                                    >
+                                        <i className="bi bi-download me-1"></i>
+                                        Export ({filteredData.length.toLocaleString()})
+                                    </button>
+                                </>
+                            )}
                         </div>
                     )}
                     {searchTerm && allData.length > 0 && (
@@ -354,7 +458,7 @@ export default function DataReader() {
                             <i className="bi bi-check-circle-fill me-2"></i>
                             Loaded <strong>{allData.length.toLocaleString()}</strong> record(s)
                             {searchTerm && ` (${filteredData.length.toLocaleString()} matched)`}
-                            {filteredData.length > rowsPerPage && (
+                            {rowsPerPage !== 'all' && filteredData.length > rowsPerPage && (
                                 <span className="ms-2">
                                     · Showing rows {(currentPage - 1) * rowsPerPage + 1}–
                                     {Math.min(currentPage * rowsPerPage, filteredData.length)} of {filteredData.length.toLocaleString()}
@@ -362,6 +466,8 @@ export default function DataReader() {
                             )}
                         </div>
                     )}
+
+
 
                     {/* Data Table */}
                     {displayData.length > 0 && !loading && getVisibleColumns.length > 0 && (
@@ -381,7 +487,7 @@ export default function DataReader() {
                                     </thead>
                                     <tbody>
                                         {displayData.map((row, rowIndex) => {
-                                            const globalIndex = (currentPage - 1) * rowsPerPage + rowIndex + 1;
+                                            const globalIndex = rowsPerPage === 'all' ? rowIndex + 1 : (currentPage - 1) * rowsPerPage + rowIndex + 1;
                                             return (
                                                 <tr key={globalIndex}>
                                                     <td>{globalIndex}</td>
