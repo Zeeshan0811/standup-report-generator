@@ -1,0 +1,484 @@
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+
+export default function DataReader() {
+    const [allData, setAllData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
+    const [displayData, setDisplayData] = useState([]);
+    const [fileName, setFileName] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(100);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [visibleColumns, setVisibleColumns] = useState({});
+    const [allColumns, setAllColumns] = useState([]);
+    const [showColumnSelector, setShowColumnSelector] = useState(false);
+
+    // Parse CSV with streaming approach for large files
+    const parseLargeCSV = useCallback((text) => {
+        const lines = text.split('\n').filter(row => row.trim() !== '');
+        if (lines.length === 0) return [];
+
+        // Parse headers
+        const headers = lines[0].split(',').map(h => h.trim());
+
+        // Parse all rows
+        const data = [];
+        for (let i = 1; i < lines.length; i++) {
+            const row = lines[i];
+            const values = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let char of row) {
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    values.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            values.push(current.trim());
+
+            // Create object
+            const obj = {};
+            headers.forEach((header, index) => {
+                obj[header] = values[index] || '';
+            });
+            data.push(obj);
+        }
+
+        return data;
+    }, []);
+
+    // Handle file selection
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setFileName(file.name);
+        setError('');
+        setAllData([]);
+        setFilteredData([]);
+        setDisplayData([]);
+        setCurrentPage(1);
+        setSearchTerm('');
+        setLoading(true);
+
+        const reader = new FileReader();
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+
+        if (fileExtension !== 'csv') {
+            setError('Please upload a CSV file only (.csv)');
+            setLoading(false);
+            e.target.value = '';
+            return;
+        }
+
+        reader.onload = (event) => {
+            try {
+                const text = event.target.result;
+                const parsedData = parseLargeCSV(text);
+                setAllData(parsedData);
+                setFilteredData(parsedData);
+
+                // Initialize visible columns
+                if (parsedData.length > 0) {
+                    const columns = Object.keys(parsedData[0]);
+                    setAllColumns(columns);
+                    const initialVisibility = {};
+                    columns.forEach(col => {
+                        initialVisibility[col] = true;
+                    });
+                    setVisibleColumns(initialVisibility);
+                }
+
+                setTotalPages(Math.ceil(parsedData.length / rowsPerPage));
+                setDisplayData(parsedData.slice(0, rowsPerPage));
+                setLoading(false);
+            } catch (err) {
+                setError('Error parsing CSV file: ' + err.message);
+                setLoading(false);
+            }
+        };
+
+        reader.onerror = () => {
+            setError('Error reading file');
+            setLoading(false);
+        };
+
+        reader.readAsText(file);
+        e.target.value = '';
+    };
+
+    // Search functionality
+    useEffect(() => {
+        if (allData.length === 0) return;
+
+        let filtered = allData;
+
+        if (searchTerm.trim() !== '') {
+            const term = searchTerm.toLowerCase().trim();
+            filtered = allData.filter(row => {
+                return Object.values(row).some(value =>
+                    String(value).toLowerCase().includes(term)
+                );
+            });
+        }
+
+        setFilteredData(filtered);
+        setTotalPages(Math.ceil(filtered.length / rowsPerPage));
+        setCurrentPage(1);
+        setDisplayData(filtered.slice(0, rowsPerPage));
+    }, [searchTerm, allData, rowsPerPage]);
+
+    // Handle pagination
+    const goToPage = (page) => {
+        if (page < 1 || page > totalPages) return;
+        setCurrentPage(page);
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        setDisplayData(filteredData.slice(start, end));
+    };
+
+    // Handle rows per page change
+    const handleRowsPerPageChange = (e) => {
+        const newRowsPerPage = parseInt(e.target.value);
+        setRowsPerPage(newRowsPerPage);
+        setTotalPages(Math.ceil(filteredData.length / newRowsPerPage));
+        setCurrentPage(1);
+        setDisplayData(filteredData.slice(0, newRowsPerPage));
+    };
+
+    // Toggle column visibility
+    const toggleColumn = (column) => {
+        setVisibleColumns(prev => ({
+            ...prev,
+            [column]: !prev[column]
+        }));
+    };
+
+    // Toggle all columns
+    const toggleAllColumns = () => {
+        const allVisible = allColumns.every(col => visibleColumns[col]);
+        const newVisibility = {};
+        allColumns.forEach(col => {
+            newVisibility[col] = !allVisible;
+        });
+        setVisibleColumns(newVisibility);
+    };
+
+    // Clear data
+    const handleClear = () => {
+        setAllData([]);
+        setFilteredData([]);
+        setDisplayData([]);
+        setFileName('');
+        setError('');
+        setCurrentPage(1);
+        setTotalPages(1);
+        setSearchTerm('');
+        setVisibleColumns({});
+        setAllColumns([]);
+    };
+
+    // Get page numbers to display
+    const getPageNumbers = () => {
+        const pages = [];
+        const maxPagesToShow = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+        let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+        if (endPage - startPage < maxPagesToShow - 1) {
+            startPage = Math.max(1, endPage - maxPagesToShow + 1);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+        }
+        return pages;
+    };
+
+    // Get visible columns for display
+    const getVisibleColumns = useMemo(() => {
+        return allColumns.filter(col => visibleColumns[col]);
+    }, [allColumns, visibleColumns]);
+
+    return (
+        <div className="container my-5">
+            <div className="card shadow-lg border-0">
+                <div className="card-header bg-primary text-white py-3">
+                    <h5 className="mb-0">
+                        <i className="bi bi-file-spreadsheet me-2"></i>
+                        Large CSV Reader
+                    </h5>
+                </div>
+                <div className="card-body">
+                    {/* File Upload Area */}
+                    <div className="row g-3 align-items-end">
+                        <div className="col-md-6">
+                            <div className="input-group">
+                                <label className="input-group-text" htmlFor="fileInput">
+                                    <i className="bi bi-upload"></i>
+                                </label>
+                                <input
+                                    type="file"
+                                    className="form-control"
+                                    id="fileInput"
+                                    accept=".csv"
+                                    onChange={handleFileChange}
+                                    disabled={loading}
+                                />
+                            </div>
+                            {fileName && (
+                                <div className="mt-2 text-muted small">
+                                    <i className="bi bi-file-earmark me-1"></i>
+                                    {fileName}
+                                </div>
+                            )}
+                        </div>
+                        <div className="col-md-6 d-flex gap-2">
+                            <button
+                                className="btn btn-outline-danger"
+                                onClick={handleClear}
+                                disabled={!allData.length && !fileName || loading}
+                            >
+                                <i className="bi bi-trash me-1"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Loading Spinner */}
+                    {loading && (
+                        <div className="text-center my-4">
+                            <div className="spinner-border text-primary" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                            <p className="mt-2 text-muted">Processing large file...</p>
+                        </div>
+                    )}
+
+                    {/* Error Message */}
+                    {error && (
+                        <div className="alert alert-danger mt-3" role="alert">
+                            <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                            {error}
+                        </div>
+                    )}
+
+                    {/* Controls - Search and Column Selector */}
+                    {allData.length > 0 && !loading && (
+                        <div className="row g-3 mt-2">
+                            <div className="col-md-6">
+                                <div className="input-group">
+                                    <span className="input-group-text">
+                                        <i className="bi bi-search"></i>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Search across all columns..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                    />
+                                    {searchTerm && (
+                                        <button
+                                            className="btn btn-outline-secondary"
+                                            onClick={() => setSearchTerm('')}
+                                            type="button"
+                                        >
+                                            <i className="bi bi-x"></i>
+                                        </button>
+                                    )}
+                                </div>
+                                {searchTerm && (
+                                    <div className="text-muted small mt-1">
+                                        Found {filteredData.length.toLocaleString()} matching records
+                                    </div>
+                                )}
+                            </div>
+                            <div className="col-md-6">
+                                <div className="d-flex gap-2">
+                                    <div className="flex-grow-1">
+                                        <select
+                                            className="form-select"
+                                            value={rowsPerPage}
+                                            onChange={handleRowsPerPageChange}
+                                        >
+                                            <option value={20}>20 rows per page</option>
+                                            <option value={50}>50 rows per page</option>
+                                            <option value={100}>100 rows per page</option>
+                                            <option value={500}>500 rows per page</option>
+                                            <option value={1000}>1000 rows per page</option>
+                                        </select>
+                                    </div>
+                                    <button
+                                        className="btn btn-outline-primary"
+                                        onClick={() => setShowColumnSelector(!showColumnSelector)}
+                                        type="button"
+                                    >
+                                        <i className="bi bi-table me-1"></i>
+                                        Columns
+                                        <span className="badge bg-primary ms-1">
+                                            {getVisibleColumns.length}/{allColumns.length}
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Column Selector Dropdown */}
+                    {showColumnSelector && allColumns.length > 0 && !loading && (
+                        <div className="card mt-3 border-primary">
+                            <div className="card-body">
+                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 className="mb-0">
+                                        <i className="bi bi-layers me-1"></i>
+                                        Select Columns to Display
+                                    </h6>
+                                    <button
+                                        className="btn btn-sm btn-outline-secondary"
+                                        onClick={toggleAllColumns}
+                                    >
+                                        {allColumns.every(col => visibleColumns[col])
+                                            ? 'Hide All'
+                                            : 'Show All'}
+                                    </button>
+                                </div>
+                                <div className="d-flex flex-wrap gap-2">
+                                    {allColumns.map((column, idx) => (
+                                        <div key={idx} className="form-check">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                id={`col-${idx}`}
+                                                checked={visibleColumns[column] !== false}
+                                                onChange={() => toggleColumn(column)}
+                                            />
+                                            <label className="form-check-label" htmlFor={`col-${idx}`}>
+                                                {column}
+                                            </label>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Record Count */}
+                    {filteredData.length > 0 && !loading && (
+                        <div className="alert alert-success mt-3" role="alert">
+                            <i className="bi bi-check-circle-fill me-2"></i>
+                            Loaded <strong>{allData.length.toLocaleString()}</strong> record(s)
+                            {searchTerm && ` (${filteredData.length.toLocaleString()} matched)`}
+                            {filteredData.length > rowsPerPage && (
+                                <span className="ms-2">
+                                    Showing rows {(currentPage - 1) * rowsPerPage + 1} to{' '}
+                                    {Math.min(currentPage * rowsPerPage, filteredData.length)} of {filteredData.length.toLocaleString()}
+                                </span>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Data Table */}
+                    {displayData.length > 0 && !loading && getVisibleColumns.length > 0 && (
+                        <>
+                            <div className="table-responsive mt-4" style={{ maxHeight: '600px', overflowY: 'auto' }}>
+                                <table className="table table-striped table-hover table-bordered">
+                                    <thead className="table-dark sticky-top">
+                                        <tr>
+                                            <th style={{ width: '60px' }}>#</th>
+                                            {getVisibleColumns.map((key, idx) => (
+                                                <th key={idx}>{key}</th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {displayData.map((row, rowIndex) => {
+                                            const globalIndex = (currentPage - 1) * rowsPerPage + rowIndex + 1;
+                                            return (
+                                                <tr key={globalIndex}>
+                                                    <td>{globalIndex}</td>
+                                                    {getVisibleColumns.map((key, colIndex) => (
+                                                        <td key={colIndex}>{row[key]}</td>
+                                                    ))}
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+                                <div className="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+                                    <div className="text-muted small">
+                                        Page {currentPage} of {totalPages}
+                                    </div>
+                                    <nav aria-label="Page navigation">
+                                        <ul className="pagination mb-0">
+                                            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                                                <button className="page-link" onClick={() => goToPage(1)}>
+                                                    <i className="bi bi-chevron-double-left"></i>
+                                                </button>
+                                            </li>
+                                            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                                                <button className="page-link" onClick={() => goToPage(currentPage - 1)}>
+                                                    <i className="bi bi-chevron-left"></i>
+                                                </button>
+                                            </li>
+
+                                            {getPageNumbers().map(page => (
+                                                <li key={page} className={`page-item ${page === currentPage ? 'active' : ''}`}>
+                                                    <button className="page-link" onClick={() => goToPage(page)}>
+                                                        {page}
+                                                    </button>
+                                                </li>
+                                            ))}
+
+                                            <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                                                <button className="page-link" onClick={() => goToPage(currentPage + 1)}>
+                                                    <i className="bi bi-chevron-right"></i>
+                                                </button>
+                                            </li>
+                                            <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                                                <button className="page-link" onClick={() => goToPage(totalPages)}>
+                                                    <i className="bi bi-chevron-double-right"></i>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                    <div className="text-muted small">
+                                        {rowsPerPage} rows per page
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    )}
+
+                    {/* No Results Message */}
+                    {searchTerm && filteredData.length === 0 && !loading && allData.length > 0 && (
+                        <div className="text-center py-4">
+                            <i className="bi bi-search" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
+                            <h5 className="mt-3 text-secondary">No results found</h5>
+                            <p className="text-muted">Try adjusting your search terms</p>
+                        </div>
+                    )}
+
+                    {/* Empty State */}
+                    {!allData.length && !error && !fileName && !loading && (
+                        <div className="text-center py-5">
+                            <i className="bi bi-file-earmark-spreadsheet" style={{ fontSize: '4rem', color: '#6c757d' }}></i>
+                            <h5 className="mt-3 text-secondary">No data loaded</h5>
+                            <p className="text-muted">Upload a CSV file to view its contents</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
