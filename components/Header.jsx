@@ -96,7 +96,12 @@ const Header = () => {
                                 FIFA <span class="badge bg-danger text-light blinking_new">New</span>
                             </Link>
                         </li>
-
+                        <li className="nav-item mx-1">
+                            <Link href="/kanban-board"
+                                className="nav-link fw-semibold px-3 py-2 rounded text-success hover-bg-light">
+                                <i className="bi bi-kanban me-1"></i> Kanban
+                            </Link>
+                        </li>
                     </ul>
                 </div>
             </div>

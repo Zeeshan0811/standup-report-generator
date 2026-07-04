@@ -155,7 +155,23 @@ const Home = () => {
                 </div>
               </div>
             </div>
-
+            {/* <!-- Kanban Board --> */}
+            <div className="col-md-4">
+              <div className="card tool-card h-100">
+                <div className="card-body text-center p-4">
+                  <div className="mb-3">
+                    <i className="bi bi-kanban display-5 text-success"></i>
+                  </div>
+                  <h5 className="card-title fw-bold">Kanban Board</h5>
+                  <p className="card-text text-muted">
+                    Organize tasks with custom statuses and drag-and-drop cards.
+                  </p>
+                  <a href="/kanban-board" className="btn btn-success text-white px-4">
+                    Open Tool
+                  </a>
+                </div>
+              </div>
+            </div>
 
 
             {/* <!-- QR Code Generator --> */}
