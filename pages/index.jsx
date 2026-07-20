@@ -155,6 +155,8 @@ const Home = () => {
                 </div>
               </div>
             </div>
+
+
             {/* <!-- Kanban Board --> */}
             <div className="col-md-4">
               <div className="card tool-card h-100">
