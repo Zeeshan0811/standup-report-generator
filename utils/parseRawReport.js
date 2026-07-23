@@ -20,6 +20,7 @@ export function parseRawReport(input, dateFromUser) {
       continue;
     }
     if (line.endsWith(':')) {
+      if (!currentPerson) continue;
       currentSection = line;
       result[currentPerson].push(`${currentSection}`);
       continue;
