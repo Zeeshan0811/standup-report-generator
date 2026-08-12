@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Head from 'next/head';
 
 const DailyReportGenerator = () => {
@@ -7,6 +7,7 @@ const DailyReportGenerator = () => {
     const [employeeName, setEmployeeName] = useState("");
     const [tasks, setTasks] = useState("");
     const [copied, setCopied] = useState({ today: false, report: false });
+    const tasksRef = useRef(null);
 
     // Load from localStorage on mount
     useEffect(() => {
@@ -42,6 +43,28 @@ const DailyReportGenerator = () => {
         const [year, month, day] = isoDate.split("-");
         return `${day}-${month}-${year}`;
     }
+
+    const insertArrowLine = () => {
+        const textarea = tasksRef.current;
+        const start = textarea ? textarea.selectionStart : tasks.length;
+        const end = textarea ? textarea.selectionEnd : tasks.length;
+        const insertion = start === 0 ? "→ " : "\n→ ";
+        const newValue = tasks.slice(0, start) + insertion + tasks.slice(end);
+        setTasks(newValue);
+        const cursorPos = start + insertion.length;
+        requestAnimationFrame(() => {
+            if (!textarea) return;
+            textarea.focus();
+            textarea.selectionStart = textarea.selectionEnd = cursorPos;
+        });
+    };
+
+    const handleTasksKeyDown = (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+            e.preventDefault();
+            insertArrowLine();
+        }
+    };
 
     const handleCopy = async (textType) => {
         const text = textType === "today" ? todayTaskOutput : dailyReportOutput;
@@ -84,13 +107,25 @@ const DailyReportGenerator = () => {
                             />
                         </div>
                         <div className="mb-3">
-                            <label className="form-label">Tasks</label>
+                            <label className="form-label d-flex justify-content-between align-items-center">
+                                Tasks
+                                <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-secondary"
+                                    onClick={insertArrowLine}
+                                    title="Insert a new → line (same as Ctrl/Cmd + Enter)"
+                                >
+                                    → Insert
+                                </button>
+                            </label>
                             <textarea
+                                ref={tasksRef}
                                 rows={8}
                                 className="form-control"
                                 value={tasks}
                                 onChange={(e) => setTasks(e.target.value)}
-                                placeholder="Your tasks for today..."
+                                onKeyDown={handleTasksKeyDown}
+                                placeholder="Your tasks for today... (Ctrl/Cmd + Enter for a new → line)"
                             />
                         </div>
                     </div>
