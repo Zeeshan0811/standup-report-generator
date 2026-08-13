@@ -128,6 +128,9 @@ const DailyReportGenerator = () => {
                                 placeholder="Your tasks for today... (Ctrl/Cmd + Enter for a new → line)"
                             />
                         </div>
+                        <p style={{ fontStyle: 'italic', marginTop: '0.5rem', color: '#888' }}>
+                            💡 Use <strong>CTRL + Enter</strong> for new lines with arrow (→).
+                        </p>
                     </div>
                     <div className="col-md-6">
                         <div className="mb-3">
